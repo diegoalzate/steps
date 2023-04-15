@@ -9,9 +9,9 @@ const Home: NextPage = () => {
         <meta name="description" content="One step at a time" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center">
+      <main className="flex min-h-screen flex-col items-center gap-4">
         <div>nav bar</div>
-        <div>make it obvious</div>
+        <div>we make habits fun</div>
         <div>make it attractive</div>
       </main>
     </>
