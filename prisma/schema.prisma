@@ -12,14 +12,14 @@ model Habit {
     id             String         @id @default(cuid())
     task           String         @db.VarChar(255)
     amount         Int
-    frecuency      Frecuency
+    frequency      Frequency
     sharingOptions SharingOptions
     userId         String
 
     @@index([userId])
 }
 
-enum Frecuency {
+enum Frequency {
     YEAR
     WEEK
     DAY
