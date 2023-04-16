@@ -1,6 +1,7 @@
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Head from "next/head";
+import Link from "next/link";
 
 const Home: NextPage = () => {
   const { isSignedIn } = useUser();
@@ -28,9 +29,12 @@ const Home: NextPage = () => {
           <h2 className="text-5xl font-bold text-amber-600">
             we make habits fun!
           </h2>
-          <button className="max-w-md rounded-lg border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black">
+          <Link
+            href={"/habits"}
+            className="max-w-md rounded-lg border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black"
+          >
             give it a try!
-          </button>
+          </Link>
         </div>
       </main>
     </>
