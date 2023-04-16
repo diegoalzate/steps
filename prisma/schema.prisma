@@ -10,13 +10,28 @@ datasource db {
 
 model Habit {
     id             String         @id @default(cuid())
+    created_at     DateTime       @default(now())
+    updated_at     DateTime       @updatedAt
     task           String         @db.VarChar(255)
     amount         Int
     frequency      Frequency
     sharingOptions SharingOptions
-    userId         String
+    userId         String         @db.VarChar(255)
+    HabitEntry     HabitEntry[]
 
     @@index([userId])
+}
+
+model HabitEntry {
+    id          String   @id @default(cuid())
+    created_at  DateTime @default(now())
+    updated_at  DateTime @updatedAt
+    habitId     String
+    habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+    description String   @db.VarChar(255)
+    feeling     String   @db.VarChar(255)
+
+    @@index([habitId])
 }
 
 enum Frequency {
