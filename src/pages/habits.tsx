@@ -3,6 +3,7 @@ import { Frequency, type Habit, SharingOptions } from "@prisma/client";
 import * as dayjs from "dayjs";
 import { api } from "~/utils/api";
 import { type ChangeEvent, useState } from "react";
+import { SignOutButton } from "@clerk/nextjs";
 
 const HabitForm = () => {
   const ctx = api.useContext();
@@ -161,7 +162,10 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
 const Habits: NextPage = () => {
   return (
     <>
-      <main className="flex min-h-screen flex-col items-center justify-center space-y-2">
+      <main className="flex min-h-screen flex-col items-center space-y-2">
+        <div className="self-end p-4">
+          <SignOutButton />
+        </div>
         <div className="w-4/5">
           <HabitForm />
         </div>
