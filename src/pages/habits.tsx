@@ -36,7 +36,7 @@ const HabitForm = () => {
       </div>
       <div className="flex min-w-full items-baseline space-x-6">
         <label className="block min-w-max text-sm font-medium leading-6 text-gray-900">
-          Task
+          task
         </label>
         <input
           id="task"
@@ -50,7 +50,7 @@ const HabitForm = () => {
       </div>
       <div className="flex min-w-full items-baseline space-x-6">
         <label className="block min-w-max text-sm font-medium leading-6 text-gray-900">
-          Amount
+          amount
         </label>
         <input
           id="amount"
@@ -63,7 +63,7 @@ const HabitForm = () => {
       </div>
       <div className="flex min-w-full items-baseline space-x-6">
         <label className="block  min-w-max text-sm font-medium leading-6 text-gray-900">
-          Frequency
+          frequency
         </label>
         <select
           name="frequency"
@@ -80,7 +80,7 @@ const HabitForm = () => {
       </div>
       <div className="flex min-w-full items-baseline space-x-6">
         <label className="block min-w-max text-sm font-medium leading-6 text-gray-900">
-          Sharing options
+          sharing options
         </label>
         <div className="flex flex-col gap-2">
           {Object.values(SharingOptions).map((option) => (
