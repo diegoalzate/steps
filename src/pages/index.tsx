@@ -1,9 +1,4 @@
-import {
-  RedirectToSignIn,
-  SignInButton,
-  SignOutButton,
-  useUser,
-} from "@clerk/nextjs";
+import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
@@ -31,7 +26,7 @@ const Home: NextPage = () => {
           )}
         </div>
         <div className="flex grow flex-col items-center justify-center gap-12">
-          <h2 className="text-5xl font-bold text-amber-600">
+          <h2 className="text-center text-5xl font-bold text-amber-600">
             track habits with friends
           </h2>
           {!isSignedIn ? (

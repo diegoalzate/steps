@@ -1,6 +1,6 @@
 import { type NextPage } from "next";
 import { Frequency, type Habit, SharingOptions } from "@prisma/client";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 import { api } from "~/utils/api";
 import { type ChangeEvent, useState } from "react";
 import { SignOutButton } from "@clerk/nextjs";
@@ -108,9 +108,9 @@ const HabitForm = () => {
 const HabitList = () => {
   const { data, isLoading } = api.habits.getAll.useQuery();
 
-  if (isLoading) return <span>is loading...</span>;
+  if (isLoading) return <span>loading...</span>;
 
-  if (!data) return <span>try again later...</span>;
+  if (!data) return <span>no data</span>;
 
   return (
     <div className="flex min-w-full flex-col space-y-2">
@@ -126,18 +126,37 @@ const HabitList = () => {
 
 const HabitCard = ({ habit }: { habit: Habit }) => {
   const ctx = api.useContext();
-  const { data, isLoading } = api.habitEntries.getEntries.useQuery(habit.id);
+
+  const lastRelevantEntriesDate = (habit: Habit) => {
+    if (habit.frequency === "DAY") {
+      const now = dayjs();
+      const startOfDay = now.startOf("day");
+      return startOfDay.toISOString();
+    } else if (habit.frequency === "WEEK") {
+      const now = dayjs();
+      const startOfWeek = now.startOf("week");
+      return startOfWeek.toISOString();
+    } else {
+      const now = dayjs();
+      const startOfMonth = now.startOf("month");
+      return startOfMonth.toISOString();
+    }
+  };
+
+  const { data, isLoading } = api.habitEntries.getEntries.useQuery({
+    habitId: habit.id,
+    createdAfterDate: lastRelevantEntriesDate(habit),
+  });
+
   const { mutate } = api.habitEntries.create.useMutation({
     onSuccess: () => {
       void ctx.habitEntries.getEntries.invalidate();
     },
   });
 
-  if (isLoading) return <span>is loading...</span>;
+  if (isLoading) return <span>loading...</span>;
 
   if (!data) return <span>try again later...</span>;
-
-  // TODO: limit entries to the time frame of the goal
 
   return (
     <div className="border-1 min-h-max flex-col space-y-2 rounded-sm p-4 shadow-sm">
