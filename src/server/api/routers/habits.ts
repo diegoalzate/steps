@@ -5,7 +5,7 @@ import { createTRPCRouter, privateProcedure } from "~/server/api/trpc";
 
 export const habitsRouter = createTRPCRouter({
   getAll: privateProcedure.query(({ ctx }) => {
-    const userId = ctx.currentUser.id;
+    const userId = ctx.userId;
 
     return ctx.prisma.habit.findMany({
       where: {
@@ -24,7 +24,7 @@ export const habitsRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { amount, frequency, sharingOptions, task } = input;
-      const userId = ctx.currentUser.id;
+      const userId = ctx.userId;
       const habit = ctx.prisma.habit.create({
         data: {
           task,

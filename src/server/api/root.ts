@@ -7,7 +7,7 @@ import { habitsRouter } from "./routers/habits";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  habit: habitsRouter,
+  habits: habitsRouter,
 });
 
 // export type definition of API

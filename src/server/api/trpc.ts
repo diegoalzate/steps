@@ -47,9 +47,9 @@ export const createTRPCContext = (opts: CreateNextContextOptions) => {
 
   const session = getAuth(req);
 
-  const { user: currentUser } = session;
+  const { userId: userId } = session;
 
-  return { ...createInnerTRPCContext({}), currentUser };
+  return { ...createInnerTRPCContext({}), userId };
 };
 
 /**
@@ -63,7 +63,6 @@ import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { getAuth } from "@clerk/nextjs/server";
-import { use } from "react";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
@@ -103,7 +102,7 @@ export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
 
 const enforceUserIsAuthenticated = t.middleware(async ({ ctx, next }) => {
-  if (!ctx.currentUser) {
+  if (!ctx.userId) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
     });
@@ -112,7 +111,7 @@ const enforceUserIsAuthenticated = t.middleware(async ({ ctx, next }) => {
   return next({
     ctx: {
       ...ctx,
-      currentUser: ctx.currentUser,
+      userId: ctx.userId,
     },
   });
 });

@@ -1,25 +1,45 @@
 import { type NextPage } from "next";
 import { Frequency, type Habit, SharingOptions } from "@prisma/client";
 import * as dayjs from "dayjs";
-
-const COMPLETED_HABIT = "🟠";
-const MISSING_HABIT = "⚪";
+import { api } from "~/utils/api";
+import { ChangeEvent, useState } from "react";
 
 const HabitForm = () => {
+  const { mutate } = api.habits.create.useMutation();
+
+  const [form, setForm] =
+    useState<Omit<Habit, "id" | "created_at" | "updated_at">>();
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
+  ) => {
+    const { name, value } = e.currentTarget;
+    if (name === "amount") {
+      setForm({ ...form, [name]: +value } as Habit);
+    } else {
+      setForm({ ...form, [name]: value } as Habit);
+    }
+  };
+
   return (
-    <form className="flex flex-col items-start gap-4 p-4 shadow-sm">
+    <form
+      className="flex flex-col items-start gap-4 p-4 shadow-sm"
+      onSubmit={() => mutate({ ...form } as Habit)}
+    >
       <div>
         <h2 className="text-base leading-7">Create a new Habit</h2>
       </div>
       <div className="flex min-w-full items-baseline space-x-6">
         <label className="block min-w-max text-sm font-medium leading-6 text-gray-900">
-          Habit
+          Task
         </label>
         <input
-          id="habit"
-          name="habit"
+          id="task"
+          name="task"
           type="text"
+          autoComplete="off"
           placeholder="ex: meditate every day at 3pm at home"
+          onChange={handleChange}
           className="block w-full rounded-md border-0 bg-transparent px-2 py-1.5 text-gray-900 outline-none ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
         />
       </div>
@@ -31,6 +51,7 @@ const HabitForm = () => {
           id="amount"
           name="amount"
           type="number"
+          onChange={handleChange}
           placeholder="3"
           className=" block w-full rounded-md border-0 bg-transparent px-2 py-1.5 text-gray-900 outline-none ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
         />
@@ -40,12 +61,13 @@ const HabitForm = () => {
           Frequency
         </label>
         <select
-          name="frequencySelect"
-          id="frequencySelect"
+          name="frequency"
+          id="frequency"
+          onChange={handleChange}
           className="block rounded-md border-0 bg-transparent px-2 py-1.5 text-gray-900 outline-none ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
         >
           {Object.values(Frequency).map((frequency) => (
-            <option value="frequency" key={frequency}>
+            <option value={frequency} key={frequency}>
               {frequency.toLocaleLowerCase()}
             </option>
           ))}
@@ -60,10 +82,11 @@ const HabitForm = () => {
             <div key={option} className="flex space-x-2">
               <input
                 type="radio"
-                name="sharingOption"
+                name="sharingOptions"
                 id={option}
                 value={option}
                 key={option}
+                onChange={handleChange}
               />
               <label htmlFor={option}>{option.toLocaleLowerCase()}</label>
             </div>
@@ -78,19 +101,25 @@ const HabitForm = () => {
 };
 
 const HabitList = () => {
+  const { data, isLoading } = api.habits.getAll.useQuery();
+
+  if (isLoading) return <span>is loading...</span>;
+
+  if (!data) return <span>try again later...</span>;
+
   return (
     <div className="flex min-w-full flex-col space-y-2">
       <h1 className="text-5xl font-bold text-amber-600">your habits</h1>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-        {[1, 2, 3, 4, 5].map((_, key) => (
-          <HabitCard key={key} />
+        {data.map((habit, key) => (
+          <HabitCard key={key} habit={habit} />
         ))}
       </div>
     </div>
   );
 };
 
-const HabitCard = () => {
+const HabitCard = ({ habit }: { habit: Habit }) => {
   // get habit entries
   // if daily habit get entries from this week
   // if weekly or monthly habit get entries from this month
@@ -98,9 +127,9 @@ const HabitCard = () => {
   return (
     <div className="border-1 min-h-max flex-col space-y-2 shadow-sm">
       <div>
-        <h4> gym +</h4>
+        <h4>{habit.task}</h4>
       </div>
-      <span>4/5</span>
+      <span>4/{habit.amount}</span>
     </div>
   );
 };
