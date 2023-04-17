@@ -16,13 +16,13 @@ export default withClerkMiddleware((request: NextRequest) => {
   }
   // if the user is not signed in redirect them to the sign in page.
   const { userId } = getAuth(request);
-
+  console.log({ userId });
   if (!userId) {
     // redirect the users to homepage
-
     const homeUrl = new URL("/", request.url);
     return NextResponse.redirect(homeUrl);
   }
+
   return NextResponse.next();
 });
 

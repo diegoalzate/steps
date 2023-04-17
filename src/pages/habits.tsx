@@ -137,9 +137,7 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
 
   if (!data) return <span>try again later...</span>;
 
-  // get habit entries
-  // if daily habit get entries from this week
-  // if weekly or monthly habit get entries from this month
+  // TODO: limit entries to the time frame of the goal
 
   return (
     <div className="border-1 min-h-max flex-col space-y-2 rounded-sm p-4 shadow-sm">
