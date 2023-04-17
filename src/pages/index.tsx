@@ -16,7 +16,7 @@ const Home: NextPage = () => {
       <main className="flex min-h-screen flex-col gap-4">
         <div className="self-end p-1">
           {!isSignedIn ? (
-            <SignInButton mode="modal">
+            <SignInButton mode="redirect">
               <button className="max-w-md rounded-lg border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black">
                 Sign in
               </button>
