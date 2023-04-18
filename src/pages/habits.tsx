@@ -2,7 +2,7 @@ import { type NextPage } from "next";
 import { Frequency, type Habit, SharingOptions } from "@prisma/client";
 import dayjs from "dayjs";
 import { api } from "~/utils/api";
-import { type ChangeEvent, useState } from "react";
+import { type ChangeEvent, useState, SyntheticEvent } from "react";
 import { SignOutButton } from "@clerk/nextjs";
 
 const COMPLETED_HABIT = "🟢";
@@ -19,7 +19,10 @@ const HabitForm = () => {
   });
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
+    e:
+      | ChangeEvent<HTMLInputElement>
+      | ChangeEvent<HTMLSelectElement>
+      | SyntheticEvent<HTMLSelectElement, Event>
   ) => {
     const { name, value } = e.currentTarget;
     if (name === "amount") {
@@ -35,8 +38,20 @@ const HabitForm = () => {
       onSubmit={() => mutate({ ...form } as Habit)}
     >
       <div>
-        <h2 className="text-base leading-7">Create a new Habit</h2>
+        <p className="text-3xl font-bold text-amber-600">
+          {!!form?.sharingOptions
+            ? form?.sharingOptions === "FRIENDS"
+              ? "🫂: "
+              : "👤: "
+            : null}
+          {form?.task} {form?.amount}{" "}
+          {form?.frequency
+            ? `times a 
+          ${form?.frequency.toLocaleLowerCase()}`
+            : ""}
+        </p>
       </div>
+
       <div className="flex min-w-full items-baseline space-x-6">
         <label className="block min-w-max text-sm font-medium leading-6 text-gray-900">
           task
@@ -74,6 +89,9 @@ const HabitForm = () => {
           onChange={handleChange}
           className="block rounded-md border-0 bg-transparent px-2 py-1.5 text-gray-900 outline-none ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
         >
+          <option selected disabled>
+            select frequency
+          </option>
           {Object.values(Frequency).map((frequency) => (
             <option value={frequency} key={frequency}>
               {frequency.toLocaleLowerCase()}
@@ -102,7 +120,7 @@ const HabitForm = () => {
         </div>
       </div>
       <button className="max-w-md self-center rounded-lg border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black ">
-        pledge
+        promise
       </button>
     </form>
   );
@@ -165,7 +183,7 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
     habit.amount - data.length < 40 ? habit.amount - data.length : 40;
 
   return (
-    <div className="border-1 flex min-h-max flex-col justify-between space-y-2 p-4 shadow-sm">
+    <div className="border-1 flex min-h-max flex-col justify-between space-y-2 overflow-ellipsis p-4 shadow-sm">
       <div className="flex justify-between">
         <h4>{habit.task}</h4>
         <button
