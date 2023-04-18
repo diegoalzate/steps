@@ -165,7 +165,7 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
     habit.amount - data.length < 40 ? habit.amount - data.length : 40;
 
   return (
-    <div className="border-1 min-h-max flex-col space-y-2 rounded-sm p-4 shadow-sm">
+    <div className="border-1 flex min-h-max flex-col justify-between space-y-2 p-4 shadow-sm">
       <div className="flex justify-between">
         <h4>{habit.task}</h4>
         <button
@@ -175,14 +175,21 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
           +
         </button>
       </div>
-      <span>
-        {data.map(() => COMPLETED_HABIT).join(" ")}
-        {numberOfPendingHabits > 0
-          ? Array.from({ length: numberOfPendingHabits })
-              .map(() => PENDING_HABIT)
-              .join(" ")
-          : null}
-      </span>
+      <div>
+        <span>
+          {data.map(() => COMPLETED_HABIT).join(" ")}{" "}
+          {numberOfPendingHabits > 0
+            ? Array.from({ length: numberOfPendingHabits })
+                .map(() => PENDING_HABIT)
+                .join(" ")
+            : null}
+        </span>
+      </div>
+      <div>
+        <span className="font-light text-slate-400">
+          {habit.frequency.toLocaleLowerCase()}
+        </span>
+      </div>
     </div>
   );
 };
