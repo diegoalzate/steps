@@ -5,6 +5,9 @@ import { api } from "~/utils/api";
 import { type ChangeEvent, useState } from "react";
 import { SignOutButton } from "@clerk/nextjs";
 
+const COMPLETED_HABIT = "🟢";
+const PENDING_HABIT = "⚪";
+
 const HabitForm = () => {
   const ctx = api.useContext();
   const [form, setForm] =
@@ -158,6 +161,7 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
 
   if (!data) return <span>try again later...</span>;
 
+  const numberOfPendingHabits = habit.amount - data.length;
   return (
     <div className="border-1 min-h-max flex-col space-y-2 rounded-sm p-4 shadow-sm">
       <div className="flex justify-between">
@@ -170,7 +174,12 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
         </button>
       </div>
       <span>
-        {data.length}/{habit.amount}
+        {data.map(() => COMPLETED_HABIT).join(" ")}
+        {numberOfPendingHabits > 0
+          ? Array.from({ length: numberOfPendingHabits })
+              .map(() => PENDING_HABIT)
+              .join(" ")
+          : null}
       </span>
     </div>
   );
