@@ -2,19 +2,36 @@ import { type NextPage } from "next";
 import { Frequency, type Habit, SharingOptions } from "@prisma/client";
 import dayjs from "dayjs";
 import { api } from "~/utils/api";
-import { type ChangeEvent, useState, SyntheticEvent } from "react";
+import { type ChangeEvent, useState, type SyntheticEvent } from "react";
 import { SignOutButton } from "@clerk/nextjs";
 
 const COMPLETED_HABIT = "🟢";
 const PENDING_HABIT = "⚪";
 
-const HabitForm = () => {
+const HabitCreator = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return isOpen ? (
+    <HabitForm setIsOpen={setIsOpen} />
+  ) : (
+    <button
+      onClick={() => setIsOpen(true)}
+      className="max-w-lg self-center rounded-3xl border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black "
+    >
+      create new habit
+    </button>
+  );
+};
+
+const HabitForm = ({ setIsOpen }: { setIsOpen: (bool: boolean) => void }) => {
   const ctx = api.useContext();
   const [form, setForm] =
     useState<Omit<Habit, "id" | "created_at" | "updated_at">>();
   const { mutate } = api.habits.create.useMutation({
     onSuccess: () => {
       void ctx.habits.invalidate();
+      setIsOpen(false);
+      setForm(undefined);
     },
   });
 
@@ -35,9 +52,12 @@ const HabitForm = () => {
   return (
     <form
       className="flex flex-col items-start gap-4 p-4 shadow-sm"
-      onSubmit={() => mutate({ ...form } as Habit)}
+      onSubmit={(e) => {
+        e.preventDefault();
+        mutate({ ...form } as Habit);
+      }}
     >
-      <div>
+      <div className="flex min-w-full justify-between">
         <p className="text-3xl font-bold text-amber-600">
           {!!form?.sharingOptions
             ? form?.sharingOptions === "FRIENDS"
@@ -47,11 +67,18 @@ const HabitForm = () => {
           {form?.task} {form?.amount}{" "}
           {form?.frequency
             ? `times a 
-          ${form?.frequency.toLocaleLowerCase()}`
+      ${form?.frequency.toLocaleLowerCase()}`
             : ""}
         </p>
+        <button
+          className="justify-self-end"
+          onClick={() => {
+            setIsOpen(false);
+          }}
+        >
+          x
+        </button>
       </div>
-
       <div className="flex min-w-full items-baseline space-x-6">
         <label className="block min-w-max text-sm font-medium leading-6 text-gray-900">
           task
@@ -131,7 +158,7 @@ const HabitList = () => {
 
   if (isLoading) return <span>loading...</span>;
 
-  if (!data) return <span>no data</span>;
+  if (!data) return <span>create first habit</span>;
 
   return (
     <div className="flex min-w-full flex-col space-y-2">
@@ -220,7 +247,7 @@ const Habits: NextPage = () => {
           <SignOutButton />
         </div>
         <div className="w-4/5">
-          <HabitForm />
+          <HabitCreator />
         </div>
         <div className="w-4/5">{<HabitList />}</div>
       </main>
