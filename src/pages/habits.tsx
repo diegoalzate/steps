@@ -102,7 +102,7 @@ const HabitForm = () => {
         </div>
       </div>
       <button className="max-w-md self-center rounded-lg border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black ">
-        save
+        pledge
       </button>
     </form>
   );
@@ -161,7 +161,9 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
 
   if (!data) return <span>try again later...</span>;
 
-  const numberOfPendingHabits = habit.amount - data.length;
+  const numberOfPendingHabits =
+    habit.amount - data.length < 40 ? habit.amount - data.length : 40;
+
   return (
     <div className="border-1 min-h-max flex-col space-y-2 rounded-sm p-4 shadow-sm">
       <div className="flex justify-between">
