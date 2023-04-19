@@ -16,8 +16,10 @@ model Habit {
     amount         Int
     frequency      Frequency
     sharingOptions SharingOptions
-    userId         String         @db.VarChar(255)
     HabitEntry     HabitEntry[]
+    userId         String?        @db.VarChar(255)
+    Group          Group?         @relation(fields: [groupId], references: [id])
+    groupId        String?
 
     @@index([userId])
 }
@@ -32,6 +34,23 @@ model HabitEntry {
     feeling     String?  @db.VarChar(255)
 
     @@index([habitId])
+}
+
+model Group {
+    id         String       @id @default(cuid())
+    groupUsers Group_User[]
+    habits     Habit[]
+}
+
+model Group_User {
+    id     String @id @default(cuid())
+    userId String @db.VarChar(255)
+
+    Group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    groupId String
+
+    @@index([groupId])
+    @@index([userId])
 }
 
 enum Frequency {
