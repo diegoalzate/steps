@@ -8,7 +8,7 @@ export const habitEntriesRouter = createTRPCRouter({
     .input(
       z.object({
         habitId: z.string(),
-        createdAfterDate: z.string(),
+        createdAfterDate: z.optional(z.string()),
       })
     )
     .query(({ ctx, input }) => {
@@ -23,6 +23,9 @@ export const habitEntriesRouter = createTRPCRouter({
           created_at: {
             gt: createdAfterDate,
           },
+        },
+        orderBy: {
+          created_at: "desc",
         },
       });
     }),
