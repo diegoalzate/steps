@@ -37,9 +37,13 @@ model HabitEntry {
 }
 
 model Group {
-    id         String       @id @default(cuid())
-    groupUsers Group_User[]
-    habits     Habit[]
+    id          String       @id @default(cuid())
+    created_at  DateTime     @default(now())
+    updated_at  DateTime     @updatedAt
+    name        String
+    description String
+    groupUsers  Group_User[]
+    habits      Habit[]
 }
 
 model Group_User {
@@ -48,6 +52,8 @@ model Group_User {
 
     Group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
     groupId String
+
+    role GroupRole @default(USER)
 
     @@index([groupId])
     @@index([userId])
@@ -62,4 +68,9 @@ enum Frequency {
 enum SharingOptions {
     PRIVATE
     FRIENDS
+}
+
+enum GroupRole {
+    ADMIN
+    USER
 }

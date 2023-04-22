@@ -1,9 +1,15 @@
 import { type NextPage } from "next";
-import { Frequency, type Habit, SharingOptions } from "@prisma/client";
+import {
+  Frequency,
+  type Habit,
+  SharingOptions,
+  type Group,
+} from "@prisma/client";
 import { api } from "~/utils/api";
 import { type ChangeEvent, useState, type SyntheticEvent } from "react";
 import { SignOutButton } from "@clerk/nextjs";
 import HabitList from "~/Components/HabitList";
+import { useRouter } from "next/router";
 
 const HabitCreator = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -150,6 +156,94 @@ const HabitForm = ({ setIsOpen }: { setIsOpen: (bool: boolean) => void }) => {
   );
 };
 
+const GroupCreator = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  return isOpen ? (
+    <GroupForm setIsOpen={setIsOpen} />
+  ) : (
+    <button
+      onClick={() => setIsOpen(true)}
+      className="max-w-lg self-center rounded-3xl border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black "
+    >
+      create new group
+    </button>
+  );
+};
+
+const GroupForm = ({ setIsOpen }: { setIsOpen: (bool: boolean) => void }) => {
+  const [form, setForm] =
+    useState<Omit<Group, "id" | "created_at" | "updated_at">>();
+  const router = useRouter();
+  const { mutate } = api.groups.create.useMutation({
+    onSuccess: (group) => {
+      void router.push(`/groups/${group.id}`);
+    },
+  });
+  const handleChange = (
+    e:
+      | ChangeEvent<HTMLInputElement>
+      | ChangeEvent<HTMLSelectElement>
+      | SyntheticEvent<HTMLSelectElement, Event>
+  ) => {
+    const { name, value } = e.currentTarget;
+    setForm({ ...form, [name]: value } as Group);
+  };
+
+  return (
+    <form
+      className="flex flex-col items-start gap-4 p-4 shadow-sm"
+      onSubmit={(e) => {
+        e.preventDefault();
+        mutate({
+          ...form,
+        } as Group);
+      }}
+    >
+      <div className="flex min-w-full justify-end">
+        <button
+          className="justify-self-end"
+          onClick={() => {
+            setIsOpen(false);
+          }}
+        >
+          x
+        </button>
+      </div>
+      <div className="flex min-w-full items-baseline space-x-6">
+        <label className="block min-w-max text-sm font-medium leading-6 text-gray-900">
+          name
+        </label>
+        <input
+          id="name"
+          name="name"
+          type="text"
+          autoComplete="off"
+          placeholder="ex: homies"
+          onChange={handleChange}
+          className="block w-full rounded-md border-0 bg-transparent px-2 py-1.5 text-gray-900 outline-none ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
+        />
+      </div>
+      <div className="flex min-w-full items-baseline space-x-6">
+        <label className="block min-w-max text-sm font-medium leading-6 text-gray-900">
+          description
+        </label>
+        <input
+          id="description"
+          name="description"
+          type="text"
+          autoComplete="off"
+          placeholder="ex: meditate every day at 3pm at home"
+          onChange={handleChange}
+          className="block w-full rounded-md border-0 bg-transparent px-2 py-1.5 text-gray-900 outline-none ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
+        />
+      </div>
+      <button className="max-w-md self-center rounded-lg border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black ">
+        create
+      </button>
+    </form>
+  );
+};
+
 const Habits: NextPage = () => {
   return (
     <>
@@ -157,8 +251,9 @@ const Habits: NextPage = () => {
         <div className="self-end p-4">
           <SignOutButton />
         </div>
-        <div className="w-4/5">
+        <div className="flex w-4/5 space-x-4">
           <HabitCreator />
+          <GroupCreator />
         </div>
         <div className="w-4/5">{<HabitList />}</div>
       </main>

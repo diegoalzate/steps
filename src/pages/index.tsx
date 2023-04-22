@@ -16,7 +16,7 @@ const Home: NextPage = () => {
       <main className="flex min-h-screen flex-col gap-4">
         <div className="self-end p-1">
           {!isSignedIn ? (
-            <SignInButton mode="modal" afterSignInUrl="/habits">
+            <SignInButton mode="modal" afterSignInUrl="/home">
               <button className="max-w-md rounded-lg border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black">
                 sign in
               </button>
@@ -30,14 +30,14 @@ const Home: NextPage = () => {
             track habits with friends
           </h2>
           {!isSignedIn ? (
-            <SignInButton mode="modal" afterSignInUrl="/habits">
+            <SignInButton mode="modal" afterSignInUrl="/home">
               <button className="max-w-md rounded-lg border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black">
                 give it a try!
               </button>
             </SignInButton>
           ) : (
             <Link
-              href={"/habits"}
+              href={"/home"}
               className="max-w-md rounded-lg border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black"
             >
               give it a try!
