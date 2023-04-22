@@ -12,21 +12,6 @@ import HabitList from "~/Components/HabitList";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
-const HabitCreator = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return isOpen ? (
-    <HabitForm setIsOpen={setIsOpen} />
-  ) : (
-    <button
-      onClick={() => setIsOpen(true)}
-      className="max-w-lg self-center rounded-3xl border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black "
-    >
-      create new habit
-    </button>
-  );
-};
-
 const HabitForm = ({ setIsOpen }: { setIsOpen: (bool: boolean) => void }) => {
   const ctx = api.useContext();
   const [form, setForm] =
@@ -157,20 +142,6 @@ const HabitForm = ({ setIsOpen }: { setIsOpen: (bool: boolean) => void }) => {
   );
 };
 
-const GroupCreator = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  return isOpen ? (
-    <GroupForm setIsOpen={setIsOpen} />
-  ) : (
-    <button
-      onClick={() => setIsOpen(true)}
-      className="max-w-lg self-center rounded-3xl border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black "
-    >
-      create new group
-    </button>
-  );
-};
-
 const GroupForm = ({ setIsOpen }: { setIsOpen: (bool: boolean) => void }) => {
   const [form, setForm] =
     useState<Omit<Group, "id" | "created_at" | "updated_at">>();
@@ -273,6 +244,35 @@ const GroupList = () => {
   );
 };
 
+const Creator = () => {
+  const [habitIsOpen, setHabitIsOpen] = useState(false);
+  const [groupIsOpen, setGroupIsOpen] = useState(false);
+
+  if (habitIsOpen) {
+    return <HabitForm setIsOpen={setHabitIsOpen} />;
+  }
+  if (groupIsOpen) {
+    return <GroupForm setIsOpen={setGroupIsOpen} />;
+  } else {
+    return (
+      <div className="flex space-x-4">
+        <button
+          onClick={() => setHabitIsOpen(true)}
+          className="max-w-lg self-center rounded-3xl border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black "
+        >
+          create new habit
+        </button>
+        <button
+          onClick={() => setGroupIsOpen(true)}
+          className="max-w-lg self-center rounded-3xl border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black "
+        >
+          create new group
+        </button>
+      </div>
+    );
+  }
+};
+
 const Habits: NextPage = () => {
   return (
     <>
@@ -280,9 +280,8 @@ const Habits: NextPage = () => {
         <div className="self-end p-4">
           <SignOutButton />
         </div>
-        <div className="flex w-4/5 space-x-4">
-          <HabitCreator />
-          <GroupCreator />
+        <div className="w-4/5">
+          <Creator />
         </div>
         <div className="w-4/5">{<HabitList />}</div>
         <div className="w-4/5">{<GroupList />}</div>
