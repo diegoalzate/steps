@@ -40,4 +40,18 @@ export const groupsRouter = createTRPCRouter({
       },
     });
   }),
+  getOne: privateProcedure
+    .input(z.optional(z.string()))
+    .query(({ ctx, input }) => {
+      return ctx.prisma.group.findFirst({
+        where: {
+          id: input,
+          groupUsers: {
+            some: {
+              userId: ctx.userId,
+            },
+          },
+        },
+      });
+    }),
 });
