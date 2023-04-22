@@ -29,4 +29,15 @@ export const groupsRouter = createTRPCRouter({
       });
       return group;
     }),
+  getAll: privateProcedure.query(({ ctx }) => {
+    return ctx.prisma.group.findMany({
+      where: {
+        groupUsers: {
+          some: {
+            userId: ctx.userId,
+          },
+        },
+      },
+    });
+  }),
 });

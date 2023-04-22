@@ -6,7 +6,7 @@ const HabitList = () => {
 
   if (isLoading) return <span>loading...</span>;
 
-  if (!data) return <span>create first habit</span>;
+  if (!data?.length) return <span></span>;
 
   return (
     <div className="flex min-w-full flex-col space-y-2">

@@ -10,6 +10,7 @@ import { type ChangeEvent, useState, type SyntheticEvent } from "react";
 import { SignOutButton } from "@clerk/nextjs";
 import HabitList from "~/Components/HabitList";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const HabitCreator = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -244,6 +245,34 @@ const GroupForm = ({ setIsOpen }: { setIsOpen: (bool: boolean) => void }) => {
   );
 };
 
+const GroupList = () => {
+  const { data, isLoading } = api.groups.getAll.useQuery();
+
+  if (isLoading) return <span>loading...</span>;
+
+  if (!data?.length) return <span></span>;
+
+  return (
+    <div className="flex min-w-full flex-col space-y-2">
+      <h1 className="text-5xl font-bold text-amber-600">your groups</h1>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+        {data.map((group, key) => (
+          <div
+            key={key}
+            className="border-1 flex min-h-max flex-col justify-between space-y-2 overflow-ellipsis p-4 shadow-sm"
+          >
+            <div className="flex justify-between">
+              <Link href={`/groups/${group.id}`}>
+                <h4>{group.name}</h4>{" "}
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const Habits: NextPage = () => {
   return (
     <>
@@ -256,6 +285,7 @@ const Habits: NextPage = () => {
           <GroupCreator />
         </div>
         <div className="w-4/5">{<HabitList />}</div>
+        <div className="w-4/5">{<GroupList />}</div>
       </main>
     </>
   );
