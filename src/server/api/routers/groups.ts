@@ -44,11 +44,6 @@ export const groupsRouter = createTRPCRouter({
       return ctx.prisma.group.findFirst({
         where: {
           id: input,
-          groupUsers: {
-            some: {
-              userId: ctx.userId,
-            },
-          },
         },
       });
     }),

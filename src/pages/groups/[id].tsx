@@ -1,20 +1,79 @@
-import { SignOutButton } from "@clerk/nextjs";
+import { SignInButton, SignOutButton, useAuth } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
-import HabitList from "~/Components/HabitList";
+import { useState } from "react";
+import { Button, HabitForm, HabitList } from "~/Components";
 import { api } from "~/utils/api";
+
+const Creator = ({ groupId }: { groupId: string }) => {
+  const [habitIsOpen, setHabitIsOpen] = useState(false);
+
+  if (habitIsOpen) {
+    return <HabitForm setIsOpen={setHabitIsOpen} groupId={groupId} />;
+  } else {
+    return (
+      <div className="flex space-x-4">
+        <Button onClick={() => setHabitIsOpen(true)} value="create new habit" />
+      </div>
+    );
+  }
+};
 
 const HabitPage: NextPage = () => {
   const router = useRouter();
+  const ctx = api.useContext();
   const id = router.query.id as string | undefined;
-  const { data: group } = api.groups.getOne.useQuery(id);
-  // const { data: groupUser } = api.groupUsers.getOne.useQuery(id);
+  const { data: group, isLoading } = api.groups.getOne.useQuery(id);
+  const { data: groupUser } = api.groupUsers.getOne.useQuery(id);
+  const { mutate: joinGroup } = api.groupUsers.create.useMutation({
+    onSuccess: () => {
+      void ctx.groupUsers.invalidate();
+    },
+  });
+  const { isSignedIn } = useAuth();
+
+  if (isLoading) return <span>loading...</span>;
+  if (!group) return <span>oops looks like this groups does not exist</span>;
+
+  if (!groupUser)
+    return (
+      <main className="flex min-h-screen min-w-full flex-col items-center justify-center space-y-2 ">
+        <div id="header" className="flex flex-col">
+          <h2 className="text-5xl font-bold text-amber-600">
+            you have been invited to: {group?.name}
+          </h2>
+          <h3 className="text-base font-light text-amber-600">
+            {group?.description}
+          </h3>
+        </div>
+        {!isSignedIn ? (
+          <SignInButton mode="modal" afterSignInUrl="/home">
+            <button className="max-w-md rounded-lg border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black">
+              create account to continue
+            </button>
+          </SignInButton>
+        ) : (
+          <Button
+            value="join group"
+            onClick={() => {
+              joinGroup(group.id);
+            }}
+          />
+        )}
+      </main>
+    );
+
   return (
     <>
       <main className="flex min-h-screen min-w-full flex-col items-center space-y-2 ">
         <div className="self-end p-4">
           <SignOutButton />
         </div>
+        {groupUser?.role === "ADMIN" ? (
+          <div className="w-4/5">
+            <Creator groupId={group.id} />
+          </div>
+        ) : null}
         <div id="header" className="flex w-4/5 flex-col">
           <h2 className="text-5xl font-bold text-amber-600">{group?.name}</h2>{" "}
           <h3 className="text-base font-light text-amber-600">

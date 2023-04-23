@@ -13,4 +13,13 @@ export const groupUsersRouter = createTRPCRouter({
         },
       });
     }),
+  create: privateProcedure.input(z.string()).mutation(({ ctx, input }) => {
+    return ctx.prisma.group_User.create({
+      data: {
+        role: "USER",
+        userId: ctx.userId,
+        groupId: input,
+      },
+    });
+  }),
 });

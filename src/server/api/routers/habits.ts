@@ -61,10 +61,11 @@ export const habitsRouter = createTRPCRouter({
         amount: z.number(),
         frequency: z.nativeEnum(Frequency),
         sharingOptions: z.nativeEnum(SharingOptions),
+        groupId: z.nullable(z.string()),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { amount, frequency, sharingOptions, task } = input;
+      const { amount, frequency, sharingOptions, task, groupId } = input;
       const userId = ctx.userId;
       const habit = ctx.prisma.habit.create({
         data: {
@@ -73,6 +74,7 @@ export const habitsRouter = createTRPCRouter({
           frequency,
           sharingOptions,
           userId,
+          groupId,
         },
       });
 

@@ -3,11 +3,9 @@ import { type Group } from "@prisma/client";
 import { api } from "~/utils/api";
 import { type ChangeEvent, useState, type SyntheticEvent } from "react";
 import { SignOutButton } from "@clerk/nextjs";
-import HabitList from "~/Components/HabitList";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import HabitForm from "~/Components/HabitForm";
-import Button from "~/Components/Button";
+import { Button, HabitForm, HabitList } from "~/Components";
 
 const GroupForm = ({ setIsOpen }: { setIsOpen: (bool: boolean) => void }) => {
   const [form, setForm] =

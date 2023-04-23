@@ -1,16 +1,38 @@
 import { Frequency, SharingOptions, type Habit } from "@prisma/client";
-import { ChangeEvent, SyntheticEvent, useState } from "react";
+import { type ChangeEvent, type SyntheticEvent, useState } from "react";
 import { api } from "~/utils/api";
 
-const HabitForm = ({ setIsOpen }: { setIsOpen: (bool: boolean) => void }) => {
+const HabitForm = ({
+  setIsOpen,
+  groupId,
+}: {
+  setIsOpen: (bool: boolean) => void;
+  groupId?: string;
+}) => {
   const ctx = api.useContext();
-  const [form, setForm] =
-    useState<Omit<Habit, "id" | "created_at" | "updated_at">>();
+  const [form, setForm] = useState<
+    Omit<Habit, "id" | "created_at" | "updated_at">
+  >({
+    sharingOptions: "FRIENDS",
+    amount: 0,
+    frequency: "DAY",
+    groupId: groupId === undefined ? null : groupId,
+    task: "",
+    userId: null,
+  });
+
   const { mutate } = api.habits.create.useMutation({
     onSuccess: () => {
       void ctx.habits.invalidate();
       setIsOpen(false);
-      setForm(undefined);
+      setForm({
+        sharingOptions: "FRIENDS",
+        amount: 0,
+        frequency: "DAY",
+        groupId: groupId === undefined ? null : groupId,
+        task: "",
+        userId: null,
+      });
     },
   });
 
@@ -105,26 +127,28 @@ const HabitForm = ({ setIsOpen }: { setIsOpen: (bool: boolean) => void }) => {
           ))}
         </select>
       </div>
-      <div className="flex min-w-full items-baseline space-x-6">
-        <label className="block min-w-max text-sm font-medium leading-6 text-gray-900">
-          sharing options
-        </label>
-        <div className="flex flex-col gap-2">
-          {Object.values(SharingOptions).map((option) => (
-            <div key={option} className="flex space-x-2">
-              <input
-                type="radio"
-                name="sharingOptions"
-                id={option}
-                value={option}
-                key={option}
-                onChange={handleChange}
-              />
-              <label htmlFor={option}>{option.toLocaleLowerCase()}</label>
-            </div>
-          ))}
+      {groupId ? null : (
+        <div className="flex min-w-full items-baseline space-x-6">
+          <label className="block min-w-max text-sm font-medium leading-6 text-gray-900">
+            sharing options
+          </label>
+          <div className="flex flex-col gap-2">
+            {Object.values(SharingOptions).map((option) => (
+              <div key={option} className="flex space-x-2">
+                <input
+                  type="radio"
+                  name="sharingOptions"
+                  id={option}
+                  value={option}
+                  key={option}
+                  onChange={handleChange}
+                />
+                <label htmlFor={option}>{option.toLocaleLowerCase()}</label>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
       <button className="max-w-md self-center rounded-lg border-2 border-amber-600 bg-amber-600 px-2 py-1 text-slate-200 hover:bg-slate-200 hover:text-black ">
         promise
       </button>

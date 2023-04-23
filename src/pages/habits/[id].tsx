@@ -3,7 +3,7 @@ import { type NextPage } from "next";
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
 import dayjs from "dayjs";
-import { Habit } from "@prisma/client";
+import { type Habit } from "@prisma/client";
 import { useCallback } from "react";
 
 const HabitPage: NextPage = () => {
@@ -14,7 +14,7 @@ const HabitPage: NextPage = () => {
   );
   const { mutate, isLoading } = api.habits.delete.useMutation({
     onSuccess: () => {
-      void router.push("/habits");
+      void router.back();
     },
   });
 
