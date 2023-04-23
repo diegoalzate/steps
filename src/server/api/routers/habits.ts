@@ -5,15 +5,24 @@ import { z } from "zod";
 import { createTRPCRouter, privateProcedure } from "~/server/api/trpc";
 
 export const habitsRouter = createTRPCRouter({
-  getAll: privateProcedure.query(({ ctx }) => {
-    const userId = ctx.userId;
-
-    return ctx.prisma.habit.findMany({
-      where: {
-        userId,
-      },
-    });
-  }),
+  getAll: privateProcedure
+    .input(z.optional(z.string()))
+    .query(({ ctx, input }) => {
+      if (input) {
+        return ctx.prisma.habit.findMany({
+          where: {
+            groupId: input,
+          },
+        });
+      } else {
+        const userId = ctx.userId;
+        return ctx.prisma.habit.findMany({
+          where: {
+            userId,
+          },
+        });
+      }
+    }),
   getOne: privateProcedure.input(z.string()).query(({ ctx, input }) => {
     const userId = ctx.userId;
 
