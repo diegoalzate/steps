@@ -1,7 +1,13 @@
 import { type Habit } from "@prisma/client";
 import dayjs from "dayjs";
+import updateLocale from "dayjs/plugin/updateLocale";
 import Link from "next/link";
 import { api } from "~/utils/api";
+
+dayjs.extend(updateLocale);
+dayjs.updateLocale("en", {
+  weekStart: 1,
+});
 
 const COMPLETED_HABIT = "🟢";
 const PENDING_HABIT = "⚪";
