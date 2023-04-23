@@ -13,8 +13,11 @@ const HabitPage: NextPage = () => {
         <div className="self-end p-4">
           <SignOutButton />
         </div>
-        <div className="flex w-4/5 justify-between">
-          <h4 className="text-5xl font-bold text-amber-600">{group?.name}</h4>{" "}
+        <div className="flex w-4/5 flex-col">
+          <h2 className="text-5xl font-bold text-amber-600">{group?.name}</h2>{" "}
+          <h3 className="text-base font-light text-amber-600">
+            {group?.description}
+          </h3>
         </div>
       </main>
     </>
