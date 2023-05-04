@@ -18,33 +18,6 @@ const HabitPage: NextPage = () => {
     },
   });
 
-  /**
-   * Gets the maximum date we will show, 5 units of time behind today
-   */
-  const getMaxLastDate = useCallback(
-    (habit?: Habit | null) => {
-      const now = dayjs();
-      if (!habit) return;
-      if (habit.frequency === "DAY") {
-        const todayMinus5UnitsOfTime = now.subtract(5, "days");
-        return todayMinus5UnitsOfTime.toISOString();
-      } else if (habit.frequency === "WEEK") {
-        const todayMinus5UnitsOfTime = now.subtract(5, "weeks");
-        return todayMinus5UnitsOfTime.toISOString();
-      } else {
-        const todayMinus5UnitsOfTime = now.subtract(5, "months");
-        return todayMinus5UnitsOfTime.toISOString();
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [habit]
-  );
-
-  //   const { data: habits, isLoading: habitsIsLoading } =
-  //     api.habitEntries.getEntries.useQuery({
-  //       habitId: id as string,
-  //     });
-
   return (
     <>
       <main className="flex min-h-screen min-w-full flex-col items-center space-y-2 ">
@@ -61,15 +34,7 @@ const HabitPage: NextPage = () => {
             delete
           </button>
         </div>
-        <div className="flex w-4/5 flex-col">
-          {/* {Array.from({ length: 5 }).map((_, index) =>
-            habit ? (
-              <div key={index}>{`${habit.frequency.toLowerCase()} ${
-                index + 1
-              }`}</div>
-            ) : null
-          )} */}
-        </div>
+        <div className="flex w-4/5 flex-col"></div>
       </main>
     </>
   );

@@ -1,77 +1,75 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider     = "mysql"
-    url          = env("DATABASE_URL")
-    relationMode = "prisma"
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model Habit {
-    id             String         @id @default(cuid())
-    created_at     DateTime       @default(now())
-    updated_at     DateTime       @updatedAt
-    task           String         @db.VarChar(255)
-    amount         Int
-    frequency      Frequency
-    sharingOptions SharingOptions
-    HabitEntry     HabitEntry[]
-    userId         String?        @db.VarChar(255)
-    Group          Group?         @relation(fields: [groupId], references: [id])
-    groupId        String?
+  id             String         @id @default(cuid())
+  task           String         @db.VarChar(255)
+  amount         Int
+  sharingOptions SharingOptions
+  userId         String?        @db.VarChar(255)
+  frequency      Frequency
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
+  groupId        String?
+  HabitEntry     HabitEntry[]
+  Group          Group?         @relation(fields: [groupId], references: [id])
 
-    @@index([userId])
-    @@index([groupId])
+  @@index([userId])
+  @@index([groupId])
 }
 
 model HabitEntry {
-    id          String   @id @default(cuid())
-    created_at  DateTime @default(now())
-    updated_at  DateTime @updatedAt
-    habitId     String
-    habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
-    description String?  @db.VarChar(255)
-    feeling     String?  @db.VarChar(255)
+  id          String   @id @default(cuid())
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  habitId     String
+  description String?  @db.VarChar(255)
+  feeling     String?  @db.VarChar(255)
+  habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
 
-    @@index([habitId])
+  @@index([habitId])
 }
 
 model Group {
-    id          String       @id @default(cuid())
-    created_at  DateTime     @default(now())
-    updated_at  DateTime     @updatedAt
-    name        String
-    description String
-    groupUsers  Group_User[]
-    habits      Habit[]
+  id          String       @id @default(cuid())
+  description String
+  name        String
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+  groupUsers  Group_User[]
+  habits      Habit[]
 }
 
 model Group_User {
-    id     String @id @default(cuid())
-    userId String @db.VarChar(255)
+  id      String    @id @default(cuid())
+  userId  String    @db.VarChar(255)
+  groupId String
+  role    GroupRole @default(USER)
+  Group   Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
-    Group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
-    groupId String
-
-    role GroupRole @default(USER)
-
-    @@index([groupId])
-    @@index([userId])
+  @@index([groupId])
+  @@index([userId])
 }
 
 enum Frequency {
-    MONTH
-    WEEK
-    DAY
+  MONTH
+  WEEK
+  DAY
 }
 
 enum SharingOptions {
-    PRIVATE
-    FRIENDS
+  PRIVATE
+  FRIENDS
 }
 
 enum GroupRole {
-    ADMIN
-    USER
+  ADMIN
+  USER
 }
