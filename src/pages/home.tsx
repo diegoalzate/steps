@@ -139,7 +139,7 @@ const Habits: NextPage = () => {
           <Creator />
         </div>
         <div className="w-4/5">
-          <HabitList />
+          <HabitList title="your habits" />
         </div>
         <div className="w-4/5">
           <GroupList />
