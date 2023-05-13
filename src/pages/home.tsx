@@ -138,8 +138,12 @@ const Habits: NextPage = () => {
         <div className="w-4/5">
           <Creator />
         </div>
-        <div className="w-4/5">{<HabitList />}</div>
-        <div className="w-4/5">{<GroupList />}</div>
+        <div className="w-4/5">
+          <HabitList />
+        </div>
+        <div className="w-4/5">
+          <GroupList />
+        </div>
       </main>
     </>
   );

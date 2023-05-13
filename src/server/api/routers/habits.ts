@@ -19,6 +19,9 @@ export const habitsRouter = createTRPCRouter({
         return ctx.prisma.habit.findMany({
           where: {
             userId,
+            groupId: {
+              equals: null,
+            },
           },
         });
       }
