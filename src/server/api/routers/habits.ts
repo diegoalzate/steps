@@ -26,15 +26,34 @@ export const habitsRouter = createTRPCRouter({
         });
       }
     }),
-  getOne: privateProcedure.input(z.string()).query(({ ctx, input }) => {
+  getOne: privateProcedure.input(z.string()).query(async ({ ctx, input }) => {
     const userId = ctx.userId;
 
-    return ctx.prisma.habit.findFirst({
+    const habit = await ctx.prisma.habit.findFirst({
       where: {
-        userId,
         id: input,
       },
     });
+
+    if (habit?.userId === userId) {
+      return habit;
+    } else if (habit?.groupId) {
+      // check if this is a group habit
+      // and user is part of group
+      const isUserPartOfGroup = await ctx.prisma.group_User.findFirst({
+        where: {
+          groupId: habit.groupId,
+          userId: userId,
+        },
+      });
+
+      if (isUserPartOfGroup) {
+        return habit;
+      }
+    }
+
+    // user did not create habit and is not part of a group that did
+    throw new TRPCError({ code: "UNAUTHORIZED" });
   }),
   delete: privateProcedure
     .input(z.string())
