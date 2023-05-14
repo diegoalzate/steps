@@ -4,7 +4,8 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { Button, HabitForm, HabitList } from "~/Components";
 import { api } from "~/utils/api";
-
+import { ShareIcon } from "@heroicons/react/24/outline";
+import { toast } from "react-hot-toast";
 const Creator = ({ groupId }: { groupId: string }) => {
   const [habitIsOpen, setHabitIsOpen] = useState(false);
 
@@ -75,10 +76,26 @@ const HabitPage: NextPage = () => {
           </div>
         ) : null}
         <div id="header" className="flex w-4/5 flex-col">
-          <h2 className="text-5xl font-bold text-amber-600">{group?.name}</h2>{" "}
+          <div className="flex items-baseline space-x-4">
+            <h2 className="text-5xl font-bold text-amber-600">{group?.name}</h2>
+            <ShareIcon
+              className="h-6 w-6 hover:cursor-pointer"
+              onClick={() => {
+                navigator.clipboard
+                  .writeText(location.origin + router.asPath)
+                  .then(() => {
+                    toast.success("copied link to clipboard");
+                  })
+                  .catch(() => console.error("error copying to clipboard"));
+              }}
+            />
+          </div>
           <h3 className="text-base font-light text-amber-600">
             {group?.description}
           </h3>
+          {
+            // leave group
+          }
         </div>
         <div id="creator"></div>
         <div id="habitList" className="flex w-4/5 flex-col">
