@@ -78,9 +78,6 @@ const HabitPage: NextPage = () => {
   return (
     <>
       <main className="flex min-h-screen min-w-full flex-col items-center space-y-2 ">
-        <div className="self-end p-4">
-          <SignOutButton />
-        </div>
         {groupUser?.role === "ADMIN" ? (
           <div className="w-4/5">
             <Creator groupId={group.id} />
