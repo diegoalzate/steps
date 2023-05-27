@@ -13,7 +13,7 @@ const Layout = ({ children }: LayoutProps) => {
     <>
       <header className="m-auto flex w-11/12 max-w-screen-xl justify-between py-8">
         <Link href="/home">
-          <h1 className="text-2xl font-bold text-amber-600">Steps</h1>
+          <h1 className="text-2xl font-bold text-amber-600">steps</h1>
         </Link>
         {!isSignedIn ? (
           <SignInButton mode="modal" afterSignInUrl="/home">
@@ -29,7 +29,7 @@ const Layout = ({ children }: LayoutProps) => {
       {/* Check min-heigth: 100vh, I'd suggest, using calc(100vh - (nav and footer heights))*/}
       <div className="m-auto w-11/12 max-w-screen-xl">{children}</div>
       <footer className="m-auto w-11/12 max-w-screen-xl py-4 text-center">
-        <p>Steps © {currentYear}</p>
+        <p>steps © {currentYear}</p>
       </footer>
     </>
   );
