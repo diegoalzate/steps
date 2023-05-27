@@ -2,7 +2,6 @@ import { type NextPage } from "next";
 import { type Group } from "@prisma/client";
 import { api } from "~/utils/api";
 import { type ChangeEvent, useState, type SyntheticEvent } from "react";
-import { SignOutButton } from "@clerk/nextjs";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Button, HabitForm, HabitList } from "~/components";
@@ -132,9 +131,6 @@ const Habits: NextPage = () => {
   return (
     <>
       <main className="flex min-h-screen flex-col items-center space-y-2">
-        <div className="self-end p-4">
-          <SignOutButton />
-        </div>
         <div className="w-4/5">
           <Creator />
         </div>

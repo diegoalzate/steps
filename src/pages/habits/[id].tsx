@@ -1,4 +1,4 @@
-import { SignOutButton, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
@@ -19,9 +19,6 @@ const HabitPage: NextPage = () => {
   return (
     <>
       <main className="flex min-h-screen min-w-full flex-col items-center space-y-2 ">
-        <div className="self-end p-4">
-          <SignOutButton />
-        </div>
         <div className="flex w-4/5 justify-between">
           <h4 className="text-5xl font-bold text-amber-600">{habit?.task}</h4>{" "}
           {
