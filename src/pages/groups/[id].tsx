@@ -1,4 +1,4 @@
-import { SignInButton, SignOutButton, useAuth } from "@clerk/nextjs";
+import { SignInButton, useAuth } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
