@@ -1,5 +1,5 @@
 import { api } from "~/utils/api";
-import HabitCard from "./temp4";
+import HabitCard from "./HabitCard";
 
 const HabitList = ({
   groupId,
