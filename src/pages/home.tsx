@@ -5,7 +5,7 @@ import { type ChangeEvent, useState, type SyntheticEvent } from "react";
 import { SignOutButton } from "@clerk/nextjs";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Button, HabitForm, HabitList } from "~/Components";
+import { Button, HabitForm, HabitList } from "~/components";
 
 const GroupForm = ({ setIsOpen }: { setIsOpen: (bool: boolean) => void }) => {
   const [form, setForm] =

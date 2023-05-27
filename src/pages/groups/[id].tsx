@@ -2,7 +2,7 @@ import { SignInButton, SignOutButton, useAuth } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { Button, HabitForm, HabitList } from "~/Components";
+import { Button, HabitForm, HabitList } from "~/components";
 import { api } from "~/utils/api";
 import { ShareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
