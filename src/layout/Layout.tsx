@@ -1,14 +1,17 @@
-import React from "react";
+import { SignInButton, useAuth, useUser } from "@clerk/nextjs";
+import { ArrowLeftCircleIcon, UserIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
+import React from "react";
+import { DropdownMenu } from "~/components";
 
 type LayoutProps = {
   children: React.ReactNode;
 };
 
 const Layout = ({ children }: LayoutProps) => {
-  const { isSignedIn } = useUser();
   const currentYear = new Date().getFullYear();
+  const { isSignedIn, signOut } = useAuth()
+  const { user } = useUser()
   return (
     <>
       <header className="m-auto flex w-11/12 max-w-screen-xl justify-between py-8">
@@ -22,7 +25,10 @@ const Layout = ({ children }: LayoutProps) => {
             </button>
           </SignInButton>
         ) : (
-          <SignOutButton />
+          <DropdownMenu menuTitle={`@${user?.username ?? 'username'}`} options={[
+            { title: 'profile', icon: UserIcon, link: '/profile' },
+            { title: 'sign out', icon: ArrowLeftCircleIcon, onClick: () => { void signOut() } }
+          ]} />
         )}
       </header>
       {/* Should be main, as it wraps the main page content, need to refactor other pages that use main too. */}
