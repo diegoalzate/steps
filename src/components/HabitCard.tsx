@@ -56,7 +56,7 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
       <div className="flex justify-between">
         <Link href={`/habits/${habit.id}`}>
           <h4>{habit.task}</h4>{" "}
-          {!!streak && <h3>{streak}🔥</h3>}
+          {!!streak && <h3 className="mt-2">{streak}🔥</h3>}
         </Link>
         <button
           onClick={() => mutate(habit.id)}

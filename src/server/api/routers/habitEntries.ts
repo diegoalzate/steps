@@ -78,6 +78,24 @@ export const habitEntriesRouter = createTRPCRouter({
       // user did not create habit and is not part of a group that did
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }),
+  /**
+   * Function to calculate the streak of completed habits for a given user.
+   *
+   * @input - The ID of the habit for which the streak is to be calculated
+   *
+   * @returns - The streak of the habit (number of consecutive completions)
+   *
+   * This function fetches the relevant Habit and HabitEntry records from the database,
+   * then calculates the streak based on the frequency of the habit and the timestamps of the HabitEntry records.
+   *
+   * Throws an error if the habit doesn't exist or the user is unauthorized.
+   *
+   * The streak is calculated by iterating over the HabitEntry records, checking if each habit completion occurred within the habit's frequency.
+   * Each time a completion is found within the frequency, the streak counter is incremented.
+   * If a completion is found that did not occur within the frequency, the counter is reset.
+   *
+   * Note that the streak calculation is performed on demand, i.e., it is not stored in the database and is recalculated each time this function is called.
+   */
   getStreak: privateProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
@@ -89,6 +107,12 @@ export const habitEntriesRouter = createTRPCRouter({
         },
       });
 
+      if (!habit)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Habit not found.",
+        });
+
       const habitEntries = await ctx.prisma.habitEntry.findMany({
         where: {
           userId,
@@ -99,11 +123,16 @@ export const habitEntriesRouter = createTRPCRouter({
         },
       });
 
+      if (habitEntries.length === 0)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "No habit entries found.",
+        });
+
       const calculateStreak = (
         habitEntries: HabitEntry[],
         frequency: Frequency
       ) => {
-        // a completed habit is a goal that is done in specific time
         let completedHabits = 0;
         const now = dayjs();
         let firstDate = now
@@ -112,50 +141,36 @@ export const habitEntriesRouter = createTRPCRouter({
         let lastDate = now
           .endOf(frequency.toLowerCase() as OpUnitType)
           .subtract(1, frequency.toLowerCase() as ManipulateType);
-        const goalAmountOfHabits = habit?.amount;
         let habitEntriesInTimeRange = 0;
-        for (const entry of habitEntries ?? []) {
+        for (const entry of habitEntries) {
           const entryDate = dayjs(entry.created_at);
 
-          if (entryDate.isBefore(firstDate)) {
-            break;
-          }
+          if (entryDate.isBefore(firstDate)) break;
 
-          const entryDateIsInRange =
-            entryDate.isAfter(firstDate) && entryDate.isBefore(lastDate);
-
-          console.log({ firstDate, lastDate, entryDate, entryDateIsInRange });
-
-          if (entryDateIsInRange) {
+          if (entryDate.isAfter(firstDate) && entryDate.isBefore(lastDate)) {
             habitEntriesInTimeRange += 1;
-          }
 
-          console.log(
-            "reached goal?",
-            habitEntriesInTimeRange === goalAmountOfHabits
-          );
-          if (habitEntriesInTimeRange === goalAmountOfHabits) {
-            // reset
-            habitEntriesInTimeRange = 0;
-            firstDate = firstDate.subtract(
-              1,
-              frequency.toLowerCase() as ManipulateType
-            );
-            lastDate = lastDate.subtract(
-              1,
-              frequency.toLowerCase() as ManipulateType
-            );
-            completedHabits += 1;
+            if (habitEntriesInTimeRange === habit.amount) {
+              // reset
+              habitEntriesInTimeRange = 0;
+              completedHabits += 1;
+              firstDate = firstDate.subtract(
+                1,
+                frequency.toLowerCase() as ManipulateType
+              );
+              lastDate = lastDate.subtract(
+                1,
+                frequency.toLowerCase() as ManipulateType
+              );
+            }
           }
         }
+
         return completedHabits;
       };
 
-      if (!habit?.frequency || !habitEntries) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
-
-      const streak = calculateStreak(habitEntries, habit?.frequency);
+      const streak = calculateStreak(habitEntries, habit.frequency);
+      console.log({ streak });
       return streak;
     }),
 });
