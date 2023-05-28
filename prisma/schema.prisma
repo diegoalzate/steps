@@ -18,7 +18,7 @@ model Habit {
   created_at     DateTime       @default(now())
   updated_at     DateTime       @updatedAt
   groupId        String?
-  HabitEntry     HabitEntry[]
+  habitEntries   HabitEntry[]
   Group          Group?         @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
   @@index([userId])
