@@ -36,6 +36,8 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
     createdAfterDate: lastRelevantEntriesDate(habit),
   });
 
+  const { data: streak } = api.habitEntries.getStreak.useQuery(habit.id)
+
   const { mutate } = api.habitEntries.create.useMutation({
     onSuccess: () => {
       void ctx.habitEntries.getEntries.invalidate();
@@ -54,6 +56,7 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
       <div className="flex justify-between">
         <Link href={`/habits/${habit.id}`}>
           <h4>{habit.task}</h4>{" "}
+          {!!streak && <h3>{streak}🔥</h3>}
         </Link>
         <button
           onClick={() => mutate(habit.id)}
@@ -67,8 +70,8 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
           {data.map(() => COMPLETED_HABIT).join(" ")}{" "}
           {numberOfPendingHabits > 0
             ? Array.from({ length: numberOfPendingHabits })
-                .map(() => PENDING_HABIT)
-                .join(" ")
+              .map(() => PENDING_HABIT)
+              .join(" ")
             : null}
         </span>
       </div>
