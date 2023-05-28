@@ -33,7 +33,9 @@ model HabitEntry {
   description String?  @db.VarChar(255)
   feeling     String?  @db.VarChar(255)
   habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  userId      String?  @db.VarChar(255)
 
+  @@index([userId])
   @@index([habitId])
 }
 

@@ -16,9 +16,7 @@ export const habitEntriesRouter = createTRPCRouter({
       const userId = ctx.userId;
       return ctx.prisma.habitEntry.findMany({
         where: {
-          habit: {
-            userId,
-          },
+          userId,
           habitId,
           created_at: {
             gt: createdAfterDate,
@@ -41,15 +39,36 @@ export const habitEntriesRouter = createTRPCRouter({
         },
       });
 
-      if (habit?.userId !== userId)
-        throw new TRPCError({ code: "UNAUTHORIZED" });
+      if (habit?.userId === userId) {
+        const habitEntry = await ctx.prisma.habitEntry.create({
+          data: {
+            habitId,
+            userId,
+          },
+        });
+        return habitEntry;
+      } else if (habit?.groupId) {
+        // check if this is a group habit
+        // and user is part of group
+        const isUserPartOfGroup = await ctx.prisma.group_User.findFirst({
+          where: {
+            groupId: habit.groupId,
+            userId: userId,
+          },
+        });
 
-      const habitEntry = await ctx.prisma.habitEntry.create({
-        data: {
-          habitId,
-        },
-      });
+        if (isUserPartOfGroup) {
+          const habitEntry = await ctx.prisma.habitEntry.create({
+            data: {
+              habitId,
+              userId,
+            },
+          });
+          return habitEntry;
+        }
+      }
 
-      return habitEntry;
+      // user did not create habit and is not part of a group that did
+      throw new TRPCError({ code: "UNAUTHORIZED" });
     }),
 });
