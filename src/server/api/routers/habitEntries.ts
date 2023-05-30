@@ -140,7 +140,8 @@ export const habitEntriesRouter = createTRPCRouter({
           .subtract(1, frequency.toLowerCase() as ManipulateType);
         let lastDate = now
           .endOf(frequency.toLowerCase() as OpUnitType)
-          .subtract(1, frequency.toLowerCase() as ManipulateType);
+          .subtract(1, frequency.toLowerCase() as ManipulateType)
+          .add(12, "hours"); // add a 12-hour grace period
         let habitEntriesInTimeRange = 0;
         for (const entry of habitEntries) {
           const entryDate = dayjs(entry.created_at);
@@ -158,10 +159,9 @@ export const habitEntriesRouter = createTRPCRouter({
                 1,
                 frequency.toLowerCase() as ManipulateType
               );
-              lastDate = lastDate.subtract(
-                1,
-                frequency.toLowerCase() as ManipulateType
-              );
+              lastDate = lastDate
+                .subtract(1, frequency.toLowerCase() as ManipulateType)
+                .add(12, "hours"); // adjust the next period with the grace period
             }
           }
         }
