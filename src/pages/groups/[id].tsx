@@ -5,7 +5,7 @@ import { useState } from "react";
 import { api } from "~/utils/api";
 import { ShareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
-import { Button, HabitForm, HabitList } from "~/components";
+import { Button, DropdownMenu, HabitForm, HabitList } from "~/components";
 
 const Creator = ({ groupId }: { groupId: string }) => {
   const [habitIsOpen, setHabitIsOpen] = useState(false);
@@ -86,24 +86,25 @@ const HabitPage: NextPage = () => {
         <div id="header" className="flex w-4/5 flex-col">
           <div className="flex items-baseline justify-between space-x-4">
             <h2 className="text-5xl font-bold text-amber-600">{group?.name}</h2>
-            <div className="flex">
-              <ShareIcon
-                className="h-6 w-6 hover:cursor-pointer"
-                onClick={() => {
+            <DropdownMenu menuTitle={`options`} options={[
+              {
+                title: 'share', icon: ShareIcon, onClick: () => {
                   navigator.clipboard
                     .writeText(location.origin + router.asPath)
                     .then(() => {
                       toast.success("copied link to clipboard");
                     })
                     .catch(() => console.error("error copying to clipboard"));
-                }}
-              />
-              <TrashIcon className="h-6 w-6 hover:cursor-pointer" onClick={() => {
-                if (id) {
-                  leaveGroup(id)
                 }
-              }} />
-            </div>
+              },
+              {
+                title: 'leave', icon: TrashIcon, onClick: () => {
+                  if (id) {
+                    leaveGroup(id)
+                  }
+                }
+              }
+            ]} />
           </div>
           <h3 className="text-base font-light text-amber-600">
             {group?.description}
