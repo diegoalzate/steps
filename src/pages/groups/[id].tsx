@@ -5,7 +5,9 @@ import { useState } from "react";
 import { api } from "~/utils/api";
 import { ShareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
-import { Button, HabitForm, HabitList } from "~/components";
+import { Button, DropdownMenu, HabitForm, HabitList } from "~/components";
+import { lastRelevantEntriesDate } from "~/utils/helpers";
+
 
 const Creator = ({ groupId }: { groupId: string }) => {
   const [habitIsOpen, setHabitIsOpen] = useState(false);
@@ -22,10 +24,11 @@ const Creator = ({ groupId }: { groupId: string }) => {
 };
 
 
-const HabitPage: NextPage = () => {
+const GroupPage: NextPage = () => {
   const router = useRouter();
   const ctx = api.useContext();
   const id = router.query.id as string | undefined;
+
   const { data: group, isLoading } = api.groups.getOne.useQuery(id);
   const { data: groupUser } = api.groupUsers.getOne.useQuery(id);
   const { mutate: joinGroup } = api.groupUsers.create.useMutation({
@@ -40,12 +43,15 @@ const HabitPage: NextPage = () => {
       router.back()
     },
   })
+  const [frequency] = useState(lastRelevantEntriesDate('MONTH'))
+  const { data: leaderboard } = api.groups.getLeaderboard.useQuery({ groupId: id ?? '', createdAfterDate: frequency })
 
   const { isSignedIn } = useAuth();
 
   if (isLoading) return <span>loading...</span>;
   if (!group) return <span>oops looks like this groups does not exist</span>;
 
+  // if you are not a member of the group
   if (!groupUser) {
     return (
       <main className="flex min-h-screen min-w-full flex-col items-center justify-center space-y-2 ">
@@ -86,36 +92,45 @@ const HabitPage: NextPage = () => {
         <div id="header" className="flex w-4/5 flex-col">
           <div className="flex items-baseline justify-between space-x-4">
             <h2 className="text-5xl font-bold text-amber-600">{group?.name}</h2>
-            <div className="flex">
-              <ShareIcon
-                className="h-6 w-6 hover:cursor-pointer"
-                onClick={() => {
+            <DropdownMenu menuTitle={`options`} options={[
+              {
+                title: 'share', icon: ShareIcon, onClick: () => {
                   navigator.clipboard
                     .writeText(location.origin + router.asPath)
                     .then(() => {
                       toast.success("copied link to clipboard");
                     })
                     .catch(() => console.error("error copying to clipboard"));
-                }}
-              />
-              <TrashIcon className="h-6 w-6 hover:cursor-pointer" onClick={() => {
-                if (id) {
-                  leaveGroup(id)
                 }
-              }} />
-            </div>
+              },
+              {
+                title: 'leave', icon: TrashIcon, onClick: () => {
+                  if (id) {
+                    leaveGroup(id)
+                  }
+                }
+              }
+            ]} />
           </div>
           <h3 className="text-base font-light text-amber-600">
             {group?.description}
           </h3>
         </div>
-        <div id="creator"></div>
         <div id="habitList" className="flex w-4/5 flex-col">
           <HabitList groupId={id} />
+        </div>
+        <div id="leaderboard" className="flex flex-col space-y-4 items-start w-4/5">
+          <h2 className="text-2xl text-amber-600">leaderboard</h2>
+          {!!leaderboard && Object.entries(leaderboard).map(([username, score]) => {
+            return <div key={username} className="flex space-x-1">
+              <p>@{username}:</p>
+              <p>{score}</p>
+            </div>
+          })}
         </div>
       </main>
     </>
   );
 };
 
-export default HabitPage;
+export default GroupPage;

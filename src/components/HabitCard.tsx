@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";
 import Link from "next/link";
 import { api } from "~/utils/api";
+import { lastRelevantEntriesDate } from "~/utils/helpers";
 
 dayjs.extend(updateLocale);
 dayjs.updateLocale("en", {
@@ -15,25 +16,9 @@ const PENDING_HABIT = "⚪";
 const HabitCard = ({ habit }: { habit: Habit }) => {
   const ctx = api.useContext();
 
-  const lastRelevantEntriesDate = (habit: Habit) => {
-    if (habit.frequency === "DAY") {
-      const now = dayjs();
-      const startOfDay = now.startOf("day");
-      return startOfDay.toISOString();
-    } else if (habit.frequency === "WEEK") {
-      const now = dayjs();
-      const startOfWeek = now.startOf("week");
-      return startOfWeek.toISOString();
-    } else {
-      const now = dayjs();
-      const startOfMonth = now.startOf("month");
-      return startOfMonth.toISOString();
-    }
-  };
-
   const { data, isLoading } = api.habitEntries.getEntries.useQuery({
     habitId: habit.id,
-    createdAfterDate: lastRelevantEntriesDate(habit),
+    createdAfterDate: lastRelevantEntriesDate(habit.frequency),
   });
 
   const { data: streak } = api.habitEntries.getStreak.useQuery(habit.id)
