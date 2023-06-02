@@ -102,4 +102,43 @@ export const habitsRouter = createTRPCRouter({
 
       return habit;
     }),
+  update: privateProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        frequency: z.nativeEnum(Frequency),
+        sharingOptions: z.nativeEnum(SharingOptions),
+        amount: z.number(),
+        groupId: z.string().nullable(),
+        task: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.userId;
+
+      const habit = await ctx.prisma.habit.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+
+      if (userId !== habit?.userId) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const updatedHabit = await ctx.prisma.habit.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          ...habit,
+          frequency: input.frequency,
+          amount: input.amount,
+          task: input.task,
+          sharingOptions: input.sharingOptions,
+        },
+      });
+
+      return updatedHabit;
+    }),
 });
