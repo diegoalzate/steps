@@ -53,7 +53,7 @@ const HabitPage: NextPage = () => {
           }
         </div>
         <div className="flex w-4/5 flex-col">
-          <div id="heatmap" className="h-60">
+          <div id="heatmap" className="hidden sm:block sm:h-64 md:">
             <ResponsiveCalendar
               data={entries?.map((entry => ({ value: 1, day: dayjs(entry.created_at).format('YYYY-MM-DD') }))) ?? []}
               from={dayjs().startOf('year').toDate()}

@@ -1,16 +1,12 @@
-import { useUser } from "@clerk/nextjs";
-import { TrashIcon } from "@heroicons/react/24/outline";
-import dynamic from "next/dynamic";
-const ResponsiveCalendar = dynamic(() => import("@nivo/calendar").then(res => res.ResponsiveCalendar), { ssr: false });
-import { type NextPage } from "next";
-import { useRouter } from "next/router";
-import { Button, DropdownMenu } from "~/components";
-import { api } from "~/utils/api";
+import { Frequency, Habit, SharingOptions } from "@prisma/client";
 import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";
+import { type NextPage } from "next";
+import { useRouter } from "next/router";
 import { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
-import { Frequency, Habit, SharingOptions } from "@prisma/client";
 import { toast } from "react-hot-toast";
+import { Button } from "~/components";
+import { api } from "~/utils/api";
 
 
 dayjs.extend(updateLocale);
