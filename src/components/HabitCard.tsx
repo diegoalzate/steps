@@ -1,9 +1,10 @@
 import { type Habit } from "@prisma/client";
-import dayjs from "dayjs";
-import updateLocale from "dayjs/plugin/updateLocale";
 import Link from "next/link";
 import { api } from "~/utils/api";
 import { lastRelevantEntriesDate } from "~/utils/helpers";
+import dayjs from "dayjs";
+import updateLocale from "dayjs/plugin/updateLocale";
+
 
 dayjs.extend(updateLocale);
 dayjs.updateLocale("en", {

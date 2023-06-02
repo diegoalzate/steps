@@ -1,16 +1,30 @@
 import { useUser } from "@clerk/nextjs";
+import { TrashIcon } from "@heroicons/react/24/outline";
+import dynamic from "next/dynamic";
+const ResponsiveCalendar = dynamic(() => import("@nivo/calendar").then(res => res.ResponsiveCalendar), { ssr: false });
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
+import { DropdownMenu } from "~/components";
 import { api } from "~/utils/api";
+import dayjs from "dayjs";
+import updateLocale from "dayjs/plugin/updateLocale";
+
+
+dayjs.extend(updateLocale);
+dayjs.updateLocale("en", {
+  weekStart: 1,
+});
 
 const HabitPage: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const { user } = useUser();
-  const { data: habit, isLoading: habitIsLoading } = api.habits.getOne.useQuery(
+  const { data: habit } = api.habits.getOne.useQuery(
     id as string
   );
-  const { mutate, isLoading } = api.habits.delete.useMutation({
+  const { data: entries } = api.habitEntries.getEntries.useQuery({ habitId: id as string })
+  console.log(entries)
+  const { mutate: deleteHabit } = api.habits.delete.useMutation({
     onSuccess: () => {
       void router.back();
     },
@@ -24,18 +38,36 @@ const HabitPage: NextPage = () => {
           {
             // only possibly delete if you created this habit
             habit && habit.userId === user?.id && (
-              <button
-                disabled={isLoading}
-                onClick={() => mutate(id as string)}
-                className="max-w-md rounded-full border-2 border-amber-600 bg-amber-600 p-1 text-slate-200 hover:bg-slate-200 hover:text-black"
-              >
-                delete
-              </button>
+              <DropdownMenu menuTitle={`options`} options={[
+                {
+                  title: 'leave', icon: TrashIcon, onClick: () => {
+                    if (id) {
+                      deleteHabit(id as string);
+                    }
+                  }
+                }
+              ]} />
             )
           }
         </div>
-        <div className="flex w-4/5 flex-col"></div>
-      </main>
+        <div className="flex w-4/5 flex-col">
+          <div id="heatmap" className="h-60">
+            <ResponsiveCalendar
+              data={entries?.map((entry => ({ value: 1, day: dayjs(entry.created_at).format('YYYY-MM-DD') }))) ?? []}
+              from={dayjs().startOf('year').toDate()}
+              to={dayjs().toDate()}
+              emptyColor="#eeeeee"
+              colors={['#61cdbb', '#97e3d5', '#e8c1a0', '#f47560']}
+              margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
+              yearSpacing={40}
+              align="top"
+              monthBorderColor="#ffffff"
+              dayBorderWidth={2}
+              dayBorderColor="#ffffff"
+            />
+          </div>
+        </div>
+      </main >
     </>
   );
 };
