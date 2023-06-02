@@ -1,5 +1,5 @@
 import { useUser } from "@clerk/nextjs";
-import { TrashIcon } from "@heroicons/react/24/outline";
+import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
 const ResponsiveCalendar = dynamic(() => import("@nivo/calendar").then(res => res.ResponsiveCalendar), { ssr: false });
 import { type NextPage } from "next";
@@ -23,7 +23,6 @@ const HabitPage: NextPage = () => {
     id as string
   );
   const { data: entries } = api.habitEntries.getEntries.useQuery({ habitId: id as string })
-  console.log(entries)
   const { mutate: deleteHabit } = api.habits.delete.useMutation({
     onSuccess: () => {
       void router.back();
@@ -39,6 +38,9 @@ const HabitPage: NextPage = () => {
             // only possibly delete if you created this habit
             habit && habit.userId === user?.id && (
               <DropdownMenu menuTitle={`options`} options={[
+                {
+                  title: 'edit', icon: PencilIcon, link: `${id as string}/edit`
+                },
                 {
                   title: 'leave', icon: TrashIcon, onClick: () => {
                     if (id) {
