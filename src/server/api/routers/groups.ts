@@ -61,6 +61,7 @@ export const groupsRouter = createTRPCRouter({
           id: input.groupId,
         },
       });
+
       if (!partOfGroup) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
@@ -68,9 +69,6 @@ export const groupsRouter = createTRPCRouter({
       const habits = await ctx.prisma.habit.findMany({
         where: {
           groupId: input.groupId,
-          created_at: {
-            gt: input.createdAfterDate,
-          },
         },
       });
 
@@ -80,6 +78,9 @@ export const groupsRouter = createTRPCRouter({
         where: {
           habitId: {
             in: habitIds,
+          },
+          created_at: {
+            gt: input.createdAfterDate,
           },
         },
       });

@@ -43,8 +43,8 @@ const GroupPage: NextPage = () => {
       router.back()
     },
   })
-  const [frequency] = useState(lastRelevantEntriesDate('MONTH'))
-  const { data: leaderboard } = api.groups.getLeaderboard.useQuery({ groupId: id ?? '', createdAfterDate: frequency })
+  const [createdAfterDate] = useState(lastRelevantEntriesDate('MONTH'))
+  const { data: leaderboard } = api.groups.getLeaderboard.useQuery({ groupId: id ?? '', createdAfterDate: createdAfterDate })
 
   const { isSignedIn } = useAuth();
 
