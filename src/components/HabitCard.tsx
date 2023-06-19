@@ -53,7 +53,7 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
         <button
           onClick={() => mutate({ habitId: habit.id })}
           {...longPressEvent}
-          className="max-w-md rounded-full border-2 border-amber-600 bg-amber-600 p-1 text-slate-200 hover:bg-slate-200 hover:text-black"
+          className="max-w-md select-none rounded-full border-2 border-amber-600 bg-amber-600 p-1 text-slate-200 hover:bg-slate-200 hover:text-black"
         >
           +
         </button>
