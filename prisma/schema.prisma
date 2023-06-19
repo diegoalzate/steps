@@ -31,7 +31,7 @@ model HabitEntry {
   updated_at  DateTime @updatedAt
   habitId     String
   description String?  @db.VarChar(255)
-  feeling     String?  @db.VarChar(255)
+  feeling     Int?
   habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
   userId      String?  @db.VarChar(255)
 

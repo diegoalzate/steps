@@ -35,9 +35,15 @@ export const habitEntriesRouter = createTRPCRouter({
       });
     }),
   create: privateProcedure
-    .input(z.string())
+    .input(
+      z.object({
+        habitId: z.string(),
+        description: z.string().optional(),
+        feeling: z.number().optional(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
-      const habitId = input;
+      const { habitId, description, feeling } = input;
       const userId = ctx.userId;
 
       const habit = await ctx.prisma.habit.findUnique({
@@ -51,6 +57,8 @@ export const habitEntriesRouter = createTRPCRouter({
           data: {
             habitId,
             userId,
+            description,
+            feeling,
           },
         });
         return habitEntry;
@@ -69,6 +77,8 @@ export const habitEntriesRouter = createTRPCRouter({
             data: {
               habitId,
               userId,
+              description,
+              feeling,
             },
           });
           return habitEntry;
@@ -170,7 +180,6 @@ export const habitEntriesRouter = createTRPCRouter({
       };
 
       const streak = calculateStreak(habitEntries, habit.frequency);
-      console.log({ streak });
       return streak;
     }),
 });

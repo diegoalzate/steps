@@ -4,7 +4,8 @@ import { api } from "~/utils/api";
 import { lastRelevantEntriesDate } from "~/utils/helpers";
 import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";
-
+import { useRouter } from "next/router";
+import { useLongPress } from "react-use";
 
 dayjs.extend(updateLocale);
 dayjs.updateLocale("en", {
@@ -15,14 +16,19 @@ const COMPLETED_HABIT = "🟢";
 const PENDING_HABIT = "⚪";
 
 const HabitCard = ({ habit }: { habit: Habit }) => {
+  const router = useRouter();
   const ctx = api.useContext();
+  const longPressEvent = useLongPress(() => {
+    // go to create habit entry with extra info page
+    void router.push(`/habits/${habit.id}/add`);
+  });
 
   const { data, isLoading } = api.habitEntries.getEntries.useQuery({
     habitId: habit.id,
     createdAfterDate: lastRelevantEntriesDate(habit.frequency),
   });
 
-  const { data: streak } = api.habitEntries.getStreak.useQuery(habit.id)
+  const { data: streak } = api.habitEntries.getStreak.useQuery(habit.id);
 
   const { mutate } = api.habitEntries.create.useMutation({
     onSuccess: () => {
@@ -45,7 +51,8 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
           {!!streak && <h3 className="mt-2">{streak}🔥</h3>}
         </Link>
         <button
-          onClick={() => mutate(habit.id)}
+          onClick={() => mutate({ habitId: habit.id })}
+          {...longPressEvent}
           className="max-w-md rounded-full border-2 border-amber-600 bg-amber-600 p-1 text-slate-200 hover:bg-slate-200 hover:text-black"
         >
           +
@@ -56,8 +63,8 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
           {data.map(() => COMPLETED_HABIT).join(" ")}{" "}
           {numberOfPendingHabits > 0
             ? Array.from({ length: numberOfPendingHabits })
-              .map(() => PENDING_HABIT)
-              .join(" ")
+                .map(() => PENDING_HABIT)
+                .join(" ")
             : null}
         </span>
       </div>
