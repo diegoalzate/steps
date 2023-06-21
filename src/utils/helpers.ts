@@ -1,11 +1,5 @@
 import type { Habit } from "@prisma/client";
-import dayjs from "dayjs";
-import updateLocale from "dayjs/plugin/updateLocale";
-
-dayjs.extend(updateLocale);
-dayjs.updateLocale("en", {
-  weekStart: 1,
-});
+import dayjs from "./dayjs";
 
 export const lastRelevantEntriesDate = (frequency: Habit["frequency"]) => {
   if (frequency === "DAY") {

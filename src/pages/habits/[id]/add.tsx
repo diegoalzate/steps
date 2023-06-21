@@ -1,16 +1,9 @@
-import dayjs from "dayjs";
-import updateLocale from "dayjs/plugin/updateLocale";
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState, type ChangeEvent, type SyntheticEvent } from "react";
 import { toast } from "react-hot-toast";
 import { Button } from "~/components";
 import { api } from "~/utils/api";
-
-dayjs.extend(updateLocale);
-dayjs.updateLocale("en", {
-  weekStart: 1,
-});
 
 const EMOJI_FEELINGS = ["😭", "😢", "😐", "🙂", "😄"];
 
