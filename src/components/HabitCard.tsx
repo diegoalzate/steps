@@ -4,6 +4,8 @@ import { api } from "~/utils/api";
 import { lastRelevantEntriesDate } from "~/utils/helpers";
 import { useRouter } from "next/router";
 import { useLongPress } from "react-use";
+import { toast } from "react-hot-toast";
+import { useReward } from "react-rewards";
 
 const COMPLETED_HABIT = "🟢";
 const PENDING_HABIT = "⚪";
@@ -23,11 +25,23 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
 
   const { data: streak } = api.habitEntries.getStreak.useQuery(habit.id);
 
-  const { mutate } = api.habitEntries.create.useMutation({
-    onSuccess: () => {
-      void ctx.habitEntries.getEntries.invalidate();
-    },
-  });
+  const { mutate, isLoading: isMutating } = api.habitEntries.create.useMutation(
+    {
+      onSuccess: () => {
+        void ctx.habitEntries.getEntries.invalidate();
+        toast.dismiss();
+        toast.success("added habit");
+        reward();
+      },
+      onMutate: () => {
+        toast.loading("adding...");
+      },
+    }
+  );
+  const { reward, isAnimating } = useReward(
+    `newHabitReward${habit.id}`,
+    "confetti"
+  );
 
   if (isLoading) return <span>loading...</span>;
 
@@ -43,13 +57,17 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
           <h4>{habit.task}</h4>{" "}
           {!!streak && <h3 className="mt-2">{streak}🔥</h3>}
         </Link>
-        <button
-          onClick={() => mutate({ habitId: habit.id })}
-          {...longPressEvent}
-          className="max-w-md rounded-full border-2 border-amber-600 bg-amber-600 p-1 text-slate-200 hover:bg-slate-200 hover:text-black"
-        >
-          +
-        </button>
+        <div className="flex flex-col">
+          <button
+            onClick={() => mutate({ habitId: habit.id })}
+            disabled={isMutating || isAnimating}
+            {...longPressEvent}
+            className="max-w-md rounded-full border-2 border-amber-600 bg-amber-600 p-1 text-slate-200 hover:bg-slate-200 hover:text-black disabled:opacity-40"
+          >
+            +
+          </button>
+          <span id={`newHabitReward${habit.id}`} />
+        </div>
       </div>
       <div>
         <span>
