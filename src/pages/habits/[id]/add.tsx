@@ -1,16 +1,10 @@
-import dayjs from "dayjs";
-import updateLocale from "dayjs/plugin/updateLocale";
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState, type ChangeEvent, type SyntheticEvent } from "react";
 import { toast } from "react-hot-toast";
 import { Button } from "~/components";
 import { api } from "~/utils/api";
-
-dayjs.extend(updateLocale);
-dayjs.updateLocale("en", {
-  weekStart: 1,
-});
+import { useReward } from "react-rewards";
 
 const EMOJI_FEELINGS = ["😭", "😢", "😐", "🙂", "😄"];
 
@@ -19,16 +13,21 @@ const EditHabitPage: NextPage = () => {
   const ctx = api.useContext();
   const { id } = router.query;
   const { data: habit } = api.habits.getOne.useQuery(id as string);
-  const { mutate: create } = api.habitEntries.create.useMutation({
-    onSuccess: () => {
-      void ctx.habits.invalidate();
-      toast.dismiss();
-      toast.success("added habit");
-    },
-    onMutate: () => {
-      toast.loading("adding...");
-    },
-  });
+  const { mutate: create, isLoading: isMutating } =
+    api.habitEntries.create.useMutation({
+      onSuccess: () => {
+        void ctx.habits.invalidate();
+        toast.dismiss();
+        toast.success("added habit");
+        router.back();
+      },
+      onMutate: () => {
+        toast.loading("adding...");
+        reward();
+      },
+    });
+  const { reward, isAnimating } = useReward(`newHabitReward`, "confetti");
+
   const [form, setForm] = useState<{
     feeling?: number;
     description?: string;
@@ -51,7 +50,7 @@ const EditHabitPage: NextPage = () => {
   return (
     <>
       <div className="flex min-h-screen min-w-full flex-col items-center space-y-2 ">
-        <div className="flex w-4/5 justify-between">
+        <div className="w-4/5 justify-between">
           <h4 className="text-5xl font-bold text-amber-600">
             {habit?.task ?? "add"}
           </h4>
@@ -105,12 +104,16 @@ const EditHabitPage: NextPage = () => {
                 ))}
               </select>
             </div>
-            <Button
-              onClick={() => {
-                console;
-              }}
-              value="save"
-            />
+            <div className="flex min-w-full flex-col items-center">
+              <Button
+                disabled={isAnimating || isMutating}
+                onClick={() => {
+                  console;
+                }}
+                value="save"
+              />
+              <span id={`newHabitReward`} />
+            </div>
           </form>
         </div>
       </div>

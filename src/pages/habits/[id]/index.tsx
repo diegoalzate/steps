@@ -1,28 +1,24 @@
 import { useUser } from "@clerk/nextjs";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
-const ResponsiveCalendar = dynamic(() => import("@nivo/calendar").then(res => res.ResponsiveCalendar), { ssr: false });
+const ResponsiveCalendar = dynamic(
+  () => import("@nivo/calendar").then((res) => res.ResponsiveCalendar),
+  { ssr: false }
+);
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
 import { DropdownMenu } from "~/components";
 import { api } from "~/utils/api";
-import dayjs from "dayjs";
-import updateLocale from "dayjs/plugin/updateLocale";
-
-
-dayjs.extend(updateLocale);
-dayjs.updateLocale("en", {
-  weekStart: 1,
-});
+import dayjs from "~/utils/dayjs";
 
 const HabitPage: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const { user } = useUser();
-  const { data: habit } = api.habits.getOne.useQuery(
-    id as string
-  );
-  const { data: entries } = api.habitEntries.getEntries.useQuery({ habitId: id as string })
+  const { data: habit } = api.habits.getOne.useQuery(id as string);
+  const { data: entries } = api.habitEntries.getEntries.useQuery({
+    habitId: id as string,
+  });
   const { mutate: deleteHabit } = api.habits.delete.useMutation({
     onSuccess: () => {
       void router.back();
@@ -37,29 +33,41 @@ const HabitPage: NextPage = () => {
           {
             // only possibly delete if you created this habit
             habit && habit.userId === user?.id && (
-              <DropdownMenu menuTitle={`options`} options={[
-                {
-                  title: 'edit', icon: PencilIcon, link: `${id as string}/edit`
-                },
-                {
-                  title: 'leave', icon: TrashIcon, onClick: () => {
-                    if (id) {
-                      deleteHabit(id as string);
-                    }
-                  }
-                }
-              ]} />
+              <DropdownMenu
+                menuTitle={`options`}
+                options={[
+                  {
+                    title: "edit",
+                    icon: PencilIcon,
+                    link: `${id as string}/edit`,
+                  },
+                  {
+                    title: "leave",
+                    icon: TrashIcon,
+                    onClick: () => {
+                      if (id) {
+                        deleteHabit(id as string);
+                      }
+                    },
+                  },
+                ]}
+              />
             )
           }
         </div>
         <div className="flex w-4/5 flex-col">
-          <div id="heatmap" className="hidden sm:block sm:h-64 md:">
+          <div id="heatmap" className="md: hidden sm:block sm:h-64">
             <ResponsiveCalendar
-              data={entries?.map((entry => ({ value: 1, day: dayjs(entry.created_at).format('YYYY-MM-DD') }))) ?? []}
-              from={dayjs().startOf('year').toDate()}
+              data={
+                entries?.map((entry) => ({
+                  value: 1,
+                  day: dayjs(entry.created_at).format("YYYY-MM-DD"),
+                })) ?? []
+              }
+              from={dayjs().startOf("year").toDate()}
               to={dayjs().toDate()}
               emptyColor="#eeeeee"
-              colors={['#61cdbb', '#97e3d5', '#e8c1a0', '#f47560']}
+              colors={["#61cdbb", "#97e3d5", "#e8c1a0", "#f47560"]}
               margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
               yearSpacing={40}
               align="top"
@@ -69,7 +77,7 @@ const HabitPage: NextPage = () => {
             />
           </div>
         </div>
-      </main >
+      </main>
     </>
   );
 };

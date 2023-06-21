@@ -2,15 +2,10 @@ import { type Habit } from "@prisma/client";
 import Link from "next/link";
 import { api } from "~/utils/api";
 import { lastRelevantEntriesDate } from "~/utils/helpers";
-import dayjs from "dayjs";
-import updateLocale from "dayjs/plugin/updateLocale";
 import { useRouter } from "next/router";
-import { useLongPress } from "react-use";
-
-dayjs.extend(updateLocale);
-dayjs.updateLocale("en", {
-  weekStart: 1,
-});
+import { toast } from "react-hot-toast";
+import { useReward } from "react-rewards";
+import useLongPress from "~/hooks/UseLongPress";
 
 const COMPLETED_HABIT = "🟢";
 const PENDING_HABIT = "⚪";
@@ -18,9 +13,12 @@ const PENDING_HABIT = "⚪";
 const HabitCard = ({ habit }: { habit: Habit }) => {
   const router = useRouter();
   const ctx = api.useContext();
-  const longPressEvent = useLongPress(() => {
-    // go to create habit entry with extra info page
-    void router.push(`/habits/${habit.id}/add`);
+  const longPressEvent = useLongPress({
+    onLongPress: () => {
+      // go to create habit entry with extra info page
+      void router.push(`/habits/${habit.id}/add`);
+    },
+    onClick: () => mutate({ habitId: habit.id }),
   });
 
   const { data, isLoading } = api.habitEntries.getEntries.useQuery({
@@ -30,11 +28,23 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
 
   const { data: streak } = api.habitEntries.getStreak.useQuery(habit.id);
 
-  const { mutate } = api.habitEntries.create.useMutation({
-    onSuccess: () => {
-      void ctx.habitEntries.getEntries.invalidate();
-    },
-  });
+  const { mutate, isLoading: isMutating } = api.habitEntries.create.useMutation(
+    {
+      onSuccess: () => {
+        void ctx.habitEntries.getEntries.invalidate();
+        toast.dismiss();
+        toast.success("added habit");
+        reward();
+      },
+      onMutate: () => {
+        toast.loading("adding...");
+      },
+    }
+  );
+  const { reward, isAnimating } = useReward(
+    `newHabitReward${habit.id}`,
+    "confetti"
+  );
 
   if (isLoading) return <span>loading...</span>;
 
@@ -49,14 +59,17 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
         <Link href={`/habits/${habit.id}`}>
           <h4>{habit.task}</h4>{" "}
           {!!streak && <h3 className="mt-2">{streak}🔥</h3>}
+          <span id={`newHabitReward${habit.id}`} />
         </Link>
-        <button
-          onClick={() => mutate({ habitId: habit.id })}
-          {...longPressEvent}
-          className="max-w-md select-none rounded-full border-2 border-amber-600 bg-amber-600 p-1 text-slate-200 hover:bg-slate-200 hover:text-black"
-        >
-          +
-        </button>
+        <div className="flex flex-col">
+          <button
+            disabled={isMutating || isAnimating}
+            {...longPressEvent}
+            className="max-w-md select-none rounded-full border-2 border-amber-600 bg-amber-600 p-1 text-slate-200 hover:bg-slate-200 hover:text-black disabled:opacity-40"
+          >
+            +
+          </button>
+        </div>
       </div>
       <div>
         <span>
