@@ -88,8 +88,8 @@ const EditHabitPage: NextPage = () => {
                 feeling
               </label>
               <select
-                name="frequency"
-                id="frequency"
+                name="feeling"
+                id="feeling"
                 value={form?.feeling}
                 onChange={handleChange}
                 className="block rounded-md border-0 bg-transparent px-2 py-1.5 text-gray-900 outline-none ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm sm:leading-6"
