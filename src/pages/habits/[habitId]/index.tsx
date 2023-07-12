@@ -13,11 +13,11 @@ import dayjs from "~/utils/dayjs";
 
 const HabitPage: NextPage = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const { habitId } = router.query;
   const { user } = useUser();
-  const { data: habit } = api.habits.getOne.useQuery(id as string);
+  const { data: habit } = api.habits.getOne.useQuery(habitId as string);
   const { data: entries } = api.habitEntries.getEntries.useQuery({
-    habitId: id as string,
+    habitId: habitId as string,
   });
   const { mutate: deleteHabit } = api.habits.delete.useMutation({
     onSuccess: () => {
@@ -39,14 +39,14 @@ const HabitPage: NextPage = () => {
                   {
                     title: "edit",
                     icon: PencilIcon,
-                    link: `${id as string}/edit`,
+                    link: `${habitId as string}/edit`,
                   },
                   {
                     title: "leave",
                     icon: TrashIcon,
                     onClick: () => {
-                      if (id) {
-                        deleteHabit(id as string);
+                      if (habitId) {
+                        deleteHabit(habitId as string);
                       }
                     },
                   },

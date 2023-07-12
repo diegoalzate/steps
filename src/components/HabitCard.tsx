@@ -16,7 +16,7 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
   const longPressEvent = useLongPress({
     onLongPress: () => {
       // go to create habit entry with extra info page
-      void router.push(`/habits/${habit.id}/add`);
+      void router.push(`/habits/${habit.id}/habitEntries/add`);
     },
     onClick: () => mutate({ habitId: habit.id }),
   });
