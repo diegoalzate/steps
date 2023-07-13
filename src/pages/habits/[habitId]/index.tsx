@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import { DropdownMenu } from "~/components";
 import { api } from "~/utils/api";
 import dayjs from "~/utils/dayjs";
+import HabitEntryCard from "~/components/HabitEntryCard";
 
 const HabitPage: NextPage = () => {
   const router = useRouter();
@@ -75,6 +76,13 @@ const HabitPage: NextPage = () => {
               dayBorderWidth={2}
               dayBorderColor="#ffffff"
             />
+          </div>
+        </div>
+        <div className="flex w-4/5 flex-col">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {entries?.map((entry, key) => (
+              <HabitEntryCard key={key} habitEntry={entry} />
+            ))}
           </div>
         </div>
       </main>
