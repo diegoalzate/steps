@@ -21,7 +21,7 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
     onClick: () => mutate({ habitId: habit.id }),
   });
 
-  const { data, isLoading } = api.habitEntries.getEntries.useQuery({
+  const { data, isLoading } = api.habitEntries.getAll.useQuery({
     habitId: habit.id,
     createdAfterDate: lastRelevantEntriesDate(habit.frequency),
   });
@@ -31,7 +31,7 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
   const { mutate, isLoading: isMutating } = api.habitEntries.create.useMutation(
     {
       onSuccess: () => {
-        void ctx.habitEntries.getEntries.invalidate();
+        void ctx.habitEntries.getAll.invalidate();
         toast.dismiss();
         toast.success("added habit");
         reward();

@@ -17,7 +17,7 @@ const HabitPage: NextPage = () => {
   const { habitId } = router.query;
   const { user } = useUser();
   const { data: habit } = api.habits.getOne.useQuery(habitId as string);
-  const { data: entries } = api.habitEntries.getEntries.useQuery({
+  const { data: entries } = api.habitEntries.getAll.useQuery({
     habitId: habitId as string,
   });
   const { mutate: deleteHabit } = api.habits.delete.useMutation({
