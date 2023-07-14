@@ -37,6 +37,31 @@ export const habitEntriesRouter = createTRPCRouter({
       },
     });
   }),
+  delete: privateProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.userId;
+      const habitEntryId = input;
+
+      const habitEntry = await ctx.prisma.habitEntry.findFirst({
+        where: {
+          id: habitEntryId,
+          userId,
+        },
+      });
+
+      if (!habitEntry) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const deleteHabitEntry = await ctx.prisma.habitEntry.delete({
+        where: {
+          id: habitEntryId,
+        },
+      });
+
+      return deleteHabitEntry;
+    }),
   create: privateProcedure
     .input(
       z.object({
