@@ -6,7 +6,7 @@ import { type ManipulateType, type OpUnitType } from "dayjs";
 import dayjs from "~/utils/dayjs";
 
 export const habitEntriesRouter = createTRPCRouter({
-  getEntries: privateProcedure
+  getAll: privateProcedure
     .input(
       z.object({
         habitId: z.string(),
@@ -28,6 +28,39 @@ export const habitEntriesRouter = createTRPCRouter({
           created_at: "desc",
         },
       });
+    }),
+  getOne: privateProcedure.input(z.string()).query(({ ctx, input }) => {
+    const id = input;
+    return ctx.prisma.habitEntry.findUnique({
+      where: {
+        id,
+      },
+    });
+  }),
+  delete: privateProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.userId;
+      const habitEntryId = input;
+
+      const habitEntry = await ctx.prisma.habitEntry.findFirst({
+        where: {
+          id: habitEntryId,
+          userId,
+        },
+      });
+
+      if (!habitEntry) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const deleteHabitEntry = await ctx.prisma.habitEntry.delete({
+        where: {
+          id: habitEntryId,
+        },
+      });
+
+      return deleteHabitEntry;
     }),
   create: privateProcedure
     .input(
@@ -82,6 +115,40 @@ export const habitEntriesRouter = createTRPCRouter({
 
       // user did not create habit and is not part of a group that did
       throw new TRPCError({ code: "UNAUTHORIZED" });
+    }),
+  update: privateProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        description: z.string().optional().nullable(),
+        feeling: z.number().optional().nullable(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.userId;
+
+      const habitEntry = await ctx.prisma.habitEntry.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+
+      if (userId !== habitEntry?.userId) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const updatedHabitEntry = await ctx.prisma.habitEntry.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          ...habitEntry,
+          description: input.description,
+          feeling: input.feeling,
+        },
+      });
+
+      return updatedHabitEntry;
     }),
   /**
    * Function to calculate the streak of completed habits for a given user.

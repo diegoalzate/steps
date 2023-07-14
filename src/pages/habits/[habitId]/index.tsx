@@ -10,14 +10,15 @@ import { useRouter } from "next/router";
 import { DropdownMenu } from "~/components";
 import { api } from "~/utils/api";
 import dayjs from "~/utils/dayjs";
+import HabitEntryCard from "~/components/HabitEntryCard";
 
 const HabitPage: NextPage = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const { habitId } = router.query;
   const { user } = useUser();
-  const { data: habit } = api.habits.getOne.useQuery(id as string);
-  const { data: entries } = api.habitEntries.getEntries.useQuery({
-    habitId: id as string,
+  const { data: habit } = api.habits.getOne.useQuery(habitId as string);
+  const { data: entries } = api.habitEntries.getAll.useQuery({
+    habitId: habitId as string,
   });
   const { mutate: deleteHabit } = api.habits.delete.useMutation({
     onSuccess: () => {
@@ -39,14 +40,14 @@ const HabitPage: NextPage = () => {
                   {
                     title: "edit",
                     icon: PencilIcon,
-                    link: `${id as string}/edit`,
+                    link: `${habitId as string}/edit`,
                   },
                   {
                     title: "leave",
                     icon: TrashIcon,
                     onClick: () => {
-                      if (id) {
-                        deleteHabit(id as string);
+                      if (habitId) {
+                        deleteHabit(habitId as string);
                       }
                     },
                   },
@@ -75,6 +76,13 @@ const HabitPage: NextPage = () => {
               dayBorderWidth={2}
               dayBorderColor="#ffffff"
             />
+          </div>
+        </div>
+        <div className="flex w-4/5 flex-col">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {entries?.map((entry, key) => (
+              <HabitEntryCard key={key} habitEntry={entry} />
+            ))}
           </div>
         </div>
       </main>

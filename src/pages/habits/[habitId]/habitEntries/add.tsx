@@ -11,8 +11,8 @@ const EMOJI_FEELINGS = ["😭", "😢", "😐", "🙂", "😄"];
 const EditHabitPage: NextPage = () => {
   const router = useRouter();
   const ctx = api.useContext();
-  const { id } = router.query;
-  const { data: habit } = api.habits.getOne.useQuery(id as string);
+  const { habitId } = router.query;
+  const { data: habit } = api.habits.getOne.useQuery(habitId as string);
   const { mutate: create, isLoading: isMutating } =
     api.habitEntries.create.useMutation({
       onSuccess: () => {

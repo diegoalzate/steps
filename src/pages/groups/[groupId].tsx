@@ -27,7 +27,7 @@ const Creator = ({ groupId }: { groupId: string }) => {
 const GroupPage: NextPage = () => {
   const router = useRouter();
   const ctx = api.useContext();
-  const id = router.query.id as string | undefined;
+  const id = router.query.groupId as string | undefined;
 
   const { data: group, isLoading } = api.groups.getOne.useQuery(id);
   const { data: groupUser } = api.groupUsers.getOne.useQuery(id);

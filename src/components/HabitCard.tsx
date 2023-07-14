@@ -16,12 +16,12 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
   const longPressEvent = useLongPress({
     onLongPress: () => {
       // go to create habit entry with extra info page
-      void router.push(`/habits/${habit.id}/add`);
+      void router.push(`/habits/${habit.id}/habitEntries/add`);
     },
     onClick: () => mutate({ habitId: habit.id }),
   });
 
-  const { data, isLoading } = api.habitEntries.getEntries.useQuery({
+  const { data, isLoading } = api.habitEntries.getAll.useQuery({
     habitId: habit.id,
     createdAfterDate: lastRelevantEntriesDate(habit.frequency),
   });
@@ -31,7 +31,7 @@ const HabitCard = ({ habit }: { habit: Habit }) => {
   const { mutate, isLoading: isMutating } = api.habitEntries.create.useMutation(
     {
       onSuccess: () => {
-        void ctx.habitEntries.getEntries.invalidate();
+        void ctx.habitEntries.getAll.invalidate();
         toast.dismiss();
         toast.success("added habit");
         reward();

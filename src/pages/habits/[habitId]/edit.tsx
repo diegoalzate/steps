@@ -16,7 +16,7 @@ const EditHabitPage: NextPage = () => {
   const ctx = api.useContext();
   const { id } = router.query;
   const { data: habit } = api.habits.getOne.useQuery(id as string);
-  const { mutate: update, isLoading } = api.habits.update.useMutation({
+  const { mutate: update } = api.habits.update.useMutation({
     onSuccess: () => {
       void ctx.habits.invalidate();
       toast.dismiss();
