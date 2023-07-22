@@ -14,8 +14,8 @@ import { api } from "~/utils/api";
 const EditHabitPage: NextPage = () => {
   const router = useRouter();
   const ctx = api.useContext();
-  const { id } = router.query;
-  const { data: habit } = api.habits.getOne.useQuery(id as string);
+  const { habitId } = router.query;
+  const { data: habit } = api.habits.getOne.useQuery(habitId as string);
   const { mutate: update } = api.habits.update.useMutation({
     onSuccess: () => {
       void ctx.habits.invalidate();
@@ -70,7 +70,7 @@ const EditHabitPage: NextPage = () => {
               e.preventDefault();
               update({
                 ...form,
-                id: id as string,
+                id: habitId as string,
               });
             }}
           >
